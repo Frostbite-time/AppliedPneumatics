@@ -14,7 +14,6 @@ import appeng.menu.MenuOpener;
 import appeng.menu.locator.ItemMenuHostLocator;
 import appeng.menu.locator.MenuLocators;
 import com.wintercogs.appliedpneumatics.common.blocks.entitis.MEAmadronProcessStationBlockEntity;
-import com.wintercogs.appliedpneumatics.common.init.APDataComponents;
 import com.wintercogs.appliedpneumatics.common.init.APItems;
 import com.wintercogs.appliedpneumatics.common.init.APMenus;
 import com.wintercogs.appliedpneumatics.common.menu.host.AmadronWirelessTerminalMenuHost;

@@ -7,11 +7,11 @@ import com.wintercogs.appliedpneumatics.common.blocks.entitis.MEPressureInterfac
 import com.wintercogs.appliedpneumatics.common.blocks.entitis.METemperatureInterfaceBlockEntity;
 import com.wintercogs.appliedpneumatics.common.items.AmadronWirelessTerminalItem;
 import com.wintercogs.appliedpneumatics.common.items.PortableAirStorageCell;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@EventBusSubscriber(modid = AppliedPneumatics.MODID, bus = EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = AppliedPneumatics.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class APCapabilities
 {
     @SubscribeEvent

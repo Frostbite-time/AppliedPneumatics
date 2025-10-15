@@ -8,7 +8,6 @@ import appeng.menu.locator.ItemMenuHostLocator;
 import appeng.util.inv.AppEngInternalInventory;
 import appeng.util.inv.InternalInventoryHost;
 import appeng.util.inv.SupplierInternalInventory;
-import com.wintercogs.appliedpneumatics.common.init.APDataComponents;
 import com.wintercogs.appliedpneumatics.common.items.AmadronWirelessTerminalItem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;

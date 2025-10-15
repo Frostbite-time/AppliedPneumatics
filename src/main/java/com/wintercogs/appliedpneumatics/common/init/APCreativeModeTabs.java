@@ -2,7 +2,6 @@ package com.wintercogs.appliedpneumatics.common.init;
 
 import appeng.api.config.Actionable;
 import appeng.api.upgrades.IUpgradeableItem;
-import appeng.items.tools.powered.PoweredContainerItem;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.Config;
 import com.wintercogs.appliedpneumatics.common.items.IAirStorageCell;
@@ -11,8 +10,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;

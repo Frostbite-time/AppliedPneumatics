@@ -6,7 +6,6 @@ import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
-import com.wintercogs.appliedpneumatics.common.init.APDataComponents;
 import me.desht.pneumaticcraft.api.crafting.AmadronTradeResource;
 import me.desht.pneumaticcraft.common.amadron.AmadronOfferManager;
 import me.desht.pneumaticcraft.common.recipes.amadron.AmadronOffer;

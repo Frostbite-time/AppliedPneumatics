@@ -2,7 +2,6 @@ package com.wintercogs.appliedpneumatics.common.items;
 
 import appeng.api.storage.cells.CellState;
 import appeng.api.upgrades.IUpgradeableItem;
-import com.wintercogs.appliedpneumatics.common.init.APDataComponents;
 import com.wintercogs.appliedpneumatics.common.me.keys.types.AirKeyType;
 import net.minecraft.world.item.ItemStack;
 

@@ -69,19 +69,9 @@ public class GenericStackInvWrapper implements GenericInternalInventory
     }
 
     @Override
-    public boolean isSupportedType(AEKeyType type) {
-        return delegate.isSupportedType(type);
-    }
-
-    @Override
-    public boolean isSupportedType(AEKey what) {
-        // 虽然接口有 default 实现，这里仍显式转发，确保若底层覆写则走其逻辑
-        return delegate.isSupportedType(what);
-    }
-
-    @Override
-    public boolean isAllowedIn(int slot, AEKey what) {
-        return delegate.isAllowedIn(slot, what);
+    public boolean isAllowed(AEKey aeKey)
+    {
+        return delegate.isAllowed(aeKey);
     }
 
     @Override

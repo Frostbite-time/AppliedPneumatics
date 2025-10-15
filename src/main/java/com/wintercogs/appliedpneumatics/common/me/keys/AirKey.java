@@ -7,9 +7,8 @@ import com.mojang.serialization.MapCodec;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.common.me.keys.types.AirKeyType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -25,9 +24,6 @@ public class AirKey extends AEKey
     private static final ResourceLocation ID = ResourceLocation.tryBuild(AppliedPneumatics.MODID,"air_key");
 
     public static final AirKey INSTANCE = new AirKey();
-    // 没有实际数据要存储，AE会在外部帮忙写入类型
-    public static final MapCodec<AirKey> MAP_CODEC = MapCodec.unit(() -> INSTANCE);
-    public static final Codec<AirKey> CODEC = MAP_CODEC.codec();
 
     private AirKey() {}
 
@@ -43,9 +39,8 @@ public class AirKey extends AEKey
         return this;
     }
 
-    // 无内部数据
     @Override
-    public CompoundTag toTag(HolderLookup.Provider registries)
+    public CompoundTag toTag()
     {
         return new CompoundTag();
     }
@@ -63,9 +58,11 @@ public class AirKey extends AEKey
         return ID;
     }
 
-    // 无内部数据
     @Override
-    public void writeToPacket(RegistryFriendlyByteBuf data) {}
+    public void writeToPacket(FriendlyByteBuf friendlyByteBuf)
+    {
+
+    }
 
     @Override
     protected Component computeDisplayName()
@@ -76,12 +73,6 @@ public class AirKey extends AEKey
     // 无掉落物
     @Override
     public void addDrops(long amount, List<ItemStack> drops, Level level, BlockPos pos) {}
-
-    @Override
-    public boolean hasComponents()
-    {
-        return false;
-    }
 
     @Override
     public int hashCode()

@@ -1,7 +1,6 @@
 package com.wintercogs.appliedpneumatics.common.eventlistner;
 
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
-import com.wintercogs.appliedpneumatics.common.init.APDataComponents;
 import com.wintercogs.appliedpneumatics.common.init.APItems;
 import com.wintercogs.appliedpneumatics.common.items.IAirStorageCell;
 import me.desht.pneumaticcraft.common.particle.AirParticleData;
@@ -14,11 +13,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.items.IItemHandler;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -27,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 当我们需要模拟驱动器的气压爆炸时，通过此类来延迟一个tick爆炸
  */
-@EventBusSubscriber(modid = AppliedPneumatics.MODID, bus = EventBusSubscriber.Bus.GAME)
+@Mod.EventBusSubscriber(modid = AppliedPneumatics.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class APDelayedBreaker
 {
     private static final Set<BlockKey> QUEUE = ConcurrentHashMap.newKeySet();
@@ -41,7 +39,7 @@ public class APDelayedBreaker
     }
 
     @SubscribeEvent
-    public static void onServerTick(ServerTickEvent.Post e)
+    public static void onServerTick(TickEvent.ServerTickEvent e)
     {
         if (QUEUE.isEmpty()) return;
 

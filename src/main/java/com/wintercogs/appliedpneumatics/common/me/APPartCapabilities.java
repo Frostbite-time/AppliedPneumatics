@@ -1,6 +1,5 @@
 package com.wintercogs.appliedpneumatics.common.me;
 
-import appeng.api.parts.RegisterPartCapabilitiesEvent;
 import appeng.parts.automation.ExportBusPart;
 import appeng.parts.automation.ImportBusPart;
 import appeng.parts.storagebus.StorageBusPart;
@@ -16,8 +15,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;

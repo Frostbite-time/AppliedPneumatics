@@ -2,10 +2,10 @@ package com.wintercogs.appliedpneumatics.common.me.keys.types;
 
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.AEKeyType;
-import com.mojang.serialization.MapCodec;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.common.me.keys.AirKey;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -20,18 +20,6 @@ public class AirKeyType extends AEKeyType
     private AirKeyType()
     {
         super(ID, AirKey.class, NAME);
-    }
-
-    @Override
-    public MapCodec<? extends AEKey> codec()
-    {
-        return AirKey.MAP_CODEC;
-    }
-
-    @Override
-    public @Nullable AEKey readFromPacket(RegistryFriendlyByteBuf input)
-    {
-        return AirKey.INSTANCE;
     }
 
     // IO端口以1000ml为一次操作标准进行传输
@@ -52,6 +40,18 @@ public class AirKeyType extends AEKeyType
     public int getAmountPerByte()
     {
         return 250;
+    }
+
+    @Override
+    public @Nullable AEKey readFromPacket(FriendlyByteBuf friendlyByteBuf)
+    {
+        return AirKey.INSTANCE;
+    }
+
+    @Override
+    public @Nullable AEKey loadKeyFromTag(CompoundTag compoundTag)
+    {
+        return AirKey.INSTANCE;
     }
 
     @Override

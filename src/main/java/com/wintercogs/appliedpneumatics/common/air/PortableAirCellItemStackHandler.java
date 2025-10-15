@@ -1,6 +1,5 @@
 package com.wintercogs.appliedpneumatics.common.air;
 
-import com.wintercogs.appliedpneumatics.common.init.APDataComponents;
 import com.wintercogs.appliedpneumatics.common.items.IAirStorageCell;
 import com.wintercogs.appliedpneumatics.util.APMath;
 import me.desht.pneumaticcraft.api.tileentity.IAirHandlerItem;

@@ -10,8 +10,8 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 
@@ -39,7 +39,7 @@ public class IngredientRenderer
     }
 
     /** 为传入的液体画一个标准的16x16的贴图 */
-    public static void darwFluidAs16WHTiledSprite(@NotNull GuiGraphics guiGraphics, @NotNull  FluidStack fluidStack, int posX, int posY)
+    public static void darwFluidAs16WHTiledSprite(@NotNull GuiGraphics guiGraphics, @NotNull FluidStack fluidStack, int posX, int posY)
     {
         if(!fluidStack.isEmpty())
         {
@@ -56,8 +56,7 @@ public class IngredientRenderer
         }
     }
 
-    public static void drawTiledSprite(GuiGraphics guiGraphics, final int tiledWidth, final int tiledHeight, int color, long scaledAmount, TextureAtlasSprite sprite, int posX, int posY)
-    {
+    public static void drawTiledSprite(GuiGraphics guiGraphics, final int tiledWidth, final int tiledHeight, int color, long scaledAmount, TextureAtlasSprite sprite, int posX, int posY) {
 
         RenderSystem.enableBlend();
 
@@ -93,19 +92,17 @@ public class IngredientRenderer
 
     }
 
-    private static void setGLColorFromInt(int color)
-    {
-        float red = ((color >> 16) & 255) / 255f;
-        float green = ((color >> 8) & 255) / 255f;
-        float blue = (color & 255) / 255f;
+    private static void setGLColorFromInt(int color) {
+        float red = ((color >> 16) & 255) / 256f;
+        float green = ((color >> 8) & 255) / 256f;
+        float blue = (color & 255) / 256f;
         //float alpha = ((color >> 24) & 0xFF) / 255F;
         float alpha = 1;
 
         RenderSystem.setShaderColor(red, green, blue, alpha);
     }
 
-    private static void drawTextureWithMasking(Matrix4f matrix, float xCoord, float yCoord, TextureAtlasSprite textureSprite, long maskTop, long maskRight, float zLevel)
-    {
+    private static void drawTextureWithMasking(Matrix4f matrix, float xCoord, float yCoord, TextureAtlasSprite textureSprite, long maskTop, long maskRight, float zLevel) {
         float uMin = textureSprite.getU0();
         float uMax = textureSprite.getU1();
         float vMin = textureSprite.getV0();
@@ -115,12 +112,13 @@ public class IngredientRenderer
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
 
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.addVertex(matrix, xCoord, yCoord + 16, zLevel).setUv(uMin, vMax);
-        bufferBuilder.addVertex(matrix, xCoord + 16 - maskRight, yCoord + 16, zLevel).setUv(uMax, vMax);
-        bufferBuilder.addVertex(matrix, xCoord + 16 - maskRight, yCoord + maskTop, zLevel).setUv(uMax, vMin);
-        bufferBuilder.addVertex(matrix, xCoord, yCoord + maskTop, zLevel).setUv(uMin, vMin);
-        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuilder();
+        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        bufferBuilder.vertex(matrix, xCoord, yCoord + 16, zLevel).uv(uMin, vMax).endVertex();
+        bufferBuilder.vertex(matrix, xCoord + 16 - maskRight, yCoord + 16, zLevel).uv(uMax, vMax).endVertex();
+        bufferBuilder.vertex(matrix, xCoord + 16 - maskRight, yCoord + maskTop, zLevel).uv(uMax, vMin).endVertex();
+        bufferBuilder.vertex(matrix, xCoord, yCoord + maskTop, zLevel).uv(uMin, vMin).endVertex();
+        tessellator.end();
     }
 }

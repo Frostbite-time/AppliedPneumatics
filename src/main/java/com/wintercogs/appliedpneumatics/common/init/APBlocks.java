@@ -8,40 +8,41 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
 public class APBlocks
 {
-    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(AppliedPneumatics.MODID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, AppliedPneumatics.MODID);
 
     // ME气压接口
-    public static final DeferredBlock<MEPressureInterfaceBlock> ME_PRESSURE_INTERFACE_BLOCK = registerBlock("me_pressure_interface_block",
+    public static final RegistryObject<MEPressureInterfaceBlock> ME_PRESSURE_INTERFACE_BLOCK = registerBlock("me_pressure_interface_block",
             ()-> new MEPressureInterfaceBlock(BlockBehaviour.Properties.of().strength(2f)));
 
     // ME亚马龙处理站
-    public static final DeferredBlock<MEAmadronProcessStation> ME_AMADRON_PROCESS_STATION = registerBlock("me_amadron_process_station",
+    public static final RegistryObject<MEAmadronProcessStation> ME_AMADRON_PROCESS_STATION = registerBlock("me_amadron_process_station",
             () -> new MEAmadronProcessStation(BlockBehaviour.Properties.of().strength(2f)));
 
     // 扩展亚马龙处理站
-    public static final DeferredBlock<MEAmadronProcessStation> ME_AMADRON_EXTENDED_PROCESS_STATION = registerBlock("me_amadron_extended_process_station",
+    public static final RegistryObject<MEAmadronProcessStation> ME_AMADRON_EXTENDED_PROCESS_STATION = registerBlock("me_amadron_extended_process_station",
             () -> new MEAmadronProcessStation(BlockBehaviour.Properties.of().strength(2f)));
 
     // ME温控接口
-    public static final DeferredBlock<METemperatureInterface> ME_TEMPERATURE_INTERFACE = registerBlock("me_temperature_interface",
+    public static final RegistryObject<METemperatureInterface> ME_TEMPERATURE_INTERFACE = registerBlock("me_temperature_interface",
             () -> new METemperatureInterface(BlockBehaviour.Properties.of().strength(2f)));
 
-    private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block)
+    private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block)
     {
-        DeferredBlock<T> toReturn = BLOCKS.register(name,block);
+        RegistryObject<T> toReturn = BLOCKS.register(name,block);
         registerBlockItem(name,toReturn);
         return toReturn;
     }
 
-    private static <T extends Block> void registerBlockItem(String name, DeferredBlock<T> block)
+    private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block)
     {
         APItems.ITEMS.register(name,() -> new BlockItem(block.get(), new Item.Properties()));
     }

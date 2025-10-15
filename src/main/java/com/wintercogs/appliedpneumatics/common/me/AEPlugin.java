@@ -12,7 +12,9 @@ import appeng.parts.automation.StorageExportStrategy;
 import appeng.parts.automation.StorageImportStrategy;
 import com.wintercogs.appliedpneumatics.common.init.APBlocks;
 import com.wintercogs.appliedpneumatics.common.init.APItems;
+import com.wintercogs.appliedpneumatics.common.items.AirStorageCell;
 import com.wintercogs.appliedpneumatics.common.items.AmadronWirelessTerminalItem;
+import com.wintercogs.appliedpneumatics.common.items.PortableAirStorageCell;
 import com.wintercogs.appliedpneumatics.common.me.keys.AirKey;
 import com.wintercogs.appliedpneumatics.common.me.keys.types.AirKeyType;
 import com.wintercogs.appliedpneumatics.common.me.storage.AirCellHandler;
@@ -24,6 +26,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraftforge.registries.RegistryObject;
 
 public class AEPlugin
 {
@@ -58,99 +61,50 @@ public class AEPlugin
         ContainerItemStrategy.register(AirKeyType.INSTANCE, AirKey.class, new AirContainerItemStrategy());
 
         // p2p协调
-        P2PTunnelAttunement.registerAttunementApi(APItems.AIR_P2P_TUNEL, PNCCapabilities.AIR_HANDLER_ITEM, Component.translatable("appliedpneumatics.pneumatic"));
-        P2PTunnelAttunement.registerAttunementTag(APItems.HEAT_P2P_TUNEL); // 用P2PTunnelAttunement.getAttunementTag(APItems.HEAT_P2P_TUNEL.get());获取此标签来标记物品
+        P2PTunnelAttunement.registerAttunementApi(APItems.AIR_P2P_TUNEL.get() , PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY, Component.translatable("appliedpneumatics.pneumatic"));
+        P2PTunnelAttunement.registerAttunementTag(APItems.HEAT_P2P_TUNEL.get()); // 用P2PTunnelAttunement.getAttunementTag(APItems.HEAT_P2P_TUNEL.get());获取此标签来标记物品
 
         // 升级卡支持
         // ME气压接口
-        Upgrades.add(APItems.VOLUME_CARD, APBlocks.ME_PRESSURE_INTERFACE_BLOCK, 4);
-        Upgrades.add(APItems.VACUUM_CARD, APBlocks.ME_PRESSURE_INTERFACE_BLOCK, 1);
-        Upgrades.add(APItems.SECURITY_CARD, APBlocks.ME_PRESSURE_INTERFACE_BLOCK, 1);
+        Upgrades.add(APItems.VOLUME_CARD.get(), APBlocks.ME_PRESSURE_INTERFACE_BLOCK.get(), 4);
+        Upgrades.add(APItems.VACUUM_CARD.get(), APBlocks.ME_PRESSURE_INTERFACE_BLOCK.get(), 1);
+        Upgrades.add(APItems.SECURITY_CARD.get(), APBlocks.ME_PRESSURE_INTERFACE_BLOCK.get(), 1);
 
         // ME温控接口
-        Upgrades.add(APItems.VOLUME_CARD, APBlocks.ME_TEMPERATURE_INTERFACE, 4);
-        Upgrades.add(AEItems.SPEED_CARD, APBlocks.ME_TEMPERATURE_INTERFACE, 4);
+        Upgrades.add(APItems.VOLUME_CARD.get(), APBlocks.ME_TEMPERATURE_INTERFACE.get(), 4);
+        Upgrades.add(AEItems.SPEED_CARD, APBlocks.ME_TEMPERATURE_INTERFACE.get(), 4);
 
         // 存储元件支持的升级卡（安全卡、真空卡） 其中真空卡为气体版溢出销毁卡
-        // 1k ~ 256M
-        Upgrades.add(APItems.SECURITY_CARD, APItems.AIR_CELL_1K, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.AIR_CELL_1K, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.AIR_CELL_4K, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.AIR_CELL_4K, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.AIR_CELL_16K, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.AIR_CELL_16K, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.AIR_CELL_64K, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.AIR_CELL_64K, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.AIR_CELL_256K, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.AIR_CELL_256K, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.AIR_CELL_1M, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.AIR_CELL_1M, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.AIR_CELL_4M, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.AIR_CELL_4M, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.AIR_CELL_16M, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.AIR_CELL_16M, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.AIR_CELL_64M, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.AIR_CELL_64M, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.AIR_CELL_256M, 1 ,CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.AIR_CELL_256M, 1 ,CELL_UPGRADE_GROUP);
+        for(RegistryObject<AirStorageCell> cell : APItems.getCELLS())
+        {
+            Upgrades.add(APItems.SECURITY_CARD.get(), cell.get(), 1 ,CELL_UPGRADE_GROUP);
+            Upgrades.add(APItems.VACUUM_CARD.get(), cell.get(), 1 ,CELL_UPGRADE_GROUP);
+        }
         // 便携气体元件支持的升级卡（安全卡、真空卡、能量卡、充气卡）
-        Upgrades.add(APItems.SECURITY_CARD, APItems.PORTABLE_AIR_CELL_1K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.PORTABLE_AIR_CELL_1K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(AEItems.ENERGY_CARD,   APItems.PORTABLE_AIR_CELL_1K, 2, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.CHARGING_CARD, APItems.PORTABLE_AIR_CELL_1K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.PORTABLE_AIR_CELL_4K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.PORTABLE_AIR_CELL_4K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(AEItems.ENERGY_CARD,   APItems.PORTABLE_AIR_CELL_4K, 2, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.CHARGING_CARD, APItems.PORTABLE_AIR_CELL_4K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.PORTABLE_AIR_CELL_16K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.PORTABLE_AIR_CELL_16K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(AEItems.ENERGY_CARD,   APItems.PORTABLE_AIR_CELL_16K, 2, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.CHARGING_CARD, APItems.PORTABLE_AIR_CELL_16K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.PORTABLE_AIR_CELL_64K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.PORTABLE_AIR_CELL_64K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(AEItems.ENERGY_CARD,   APItems.PORTABLE_AIR_CELL_64K, 2, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.CHARGING_CARD, APItems.PORTABLE_AIR_CELL_64K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.PORTABLE_AIR_CELL_256K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.PORTABLE_AIR_CELL_256K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(AEItems.ENERGY_CARD,   APItems.PORTABLE_AIR_CELL_256K, 2, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.CHARGING_CARD, APItems.PORTABLE_AIR_CELL_256K, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.PORTABLE_AIR_CELL_1M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.PORTABLE_AIR_CELL_1M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(AEItems.ENERGY_CARD,   APItems.PORTABLE_AIR_CELL_1M, 2, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.CHARGING_CARD, APItems.PORTABLE_AIR_CELL_1M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.PORTABLE_AIR_CELL_4M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.PORTABLE_AIR_CELL_4M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(AEItems.ENERGY_CARD,   APItems.PORTABLE_AIR_CELL_4M, 2, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.CHARGING_CARD, APItems.PORTABLE_AIR_CELL_4M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.PORTABLE_AIR_CELL_16M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.PORTABLE_AIR_CELL_16M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(AEItems.ENERGY_CARD,   APItems.PORTABLE_AIR_CELL_16M, 2, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.CHARGING_CARD, APItems.PORTABLE_AIR_CELL_16M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.PORTABLE_AIR_CELL_64M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.PORTABLE_AIR_CELL_64M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(AEItems.ENERGY_CARD,   APItems.PORTABLE_AIR_CELL_64M, 2, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.CHARGING_CARD, APItems.PORTABLE_AIR_CELL_64M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.SECURITY_CARD, APItems.PORTABLE_AIR_CELL_256M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.VACUUM_CARD,   APItems.PORTABLE_AIR_CELL_256M, 1, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(AEItems.ENERGY_CARD,   APItems.PORTABLE_AIR_CELL_256M, 2, PORTABLE_CELL_UPGRADE_GROUP);
-        Upgrades.add(APItems.CHARGING_CARD, APItems.PORTABLE_AIR_CELL_256M, 1, PORTABLE_CELL_UPGRADE_GROUP);
+        for(RegistryObject<PortableAirStorageCell> portableCell : APItems.getPortableCells())
+        {
+            Upgrades.add(APItems.SECURITY_CARD.get(), portableCell.get(), 1, PORTABLE_CELL_UPGRADE_GROUP);
+            Upgrades.add(APItems.VACUUM_CARD.get(), portableCell.get(), 1, PORTABLE_CELL_UPGRADE_GROUP);
+            Upgrades.add(AEItems.ENERGY_CARD, portableCell.get(), 2, PORTABLE_CELL_UPGRADE_GROUP);
+            Upgrades.add(APItems.CHARGING_CARD.get(), portableCell.get(), 1, PORTABLE_CELL_UPGRADE_GROUP);
+        }
 
         // 亚马龙终端
-        Upgrades.add(AEItems.ENERGY_CARD, APItems.AMADRON_WIRELESS_TERMINAL, 2);
+        Upgrades.add(AEItems.ENERGY_CARD, APItems.AMADRON_WIRELESS_TERMINAL.get(), 2);
 
         // 亚马龙处理站
-        Upgrades.add(AEItems.SPEED_CARD, APBlocks.ME_AMADRON_PROCESS_STATION, 4);
-        Upgrades.add(AEItems.SPEED_CARD, APBlocks.ME_AMADRON_EXTENDED_PROCESS_STATION, 4);
+        Upgrades.add(AEItems.SPEED_CARD, APBlocks.ME_AMADRON_PROCESS_STATION.get(), 4);
+        Upgrades.add(AEItems.SPEED_CARD, APBlocks.ME_AMADRON_EXTENDED_PROCESS_STATION.get(), 4);
 
         // 添加无线终端绑定支持
-        GridLinkables.register(APItems.AMADRON_WIRELESS_TERMINAL, AmadronWirelessTerminalItem.LINKABLE_HANDLER);
+        GridLinkables.register(APItems.AMADRON_WIRELESS_TERMINAL.get(), AmadronWirelessTerminalItem.LINKABLE_HANDLER);
 
     }
 
     public static StackImportStrategy createAirImport(ServerLevel level, BlockPos fromPos, Direction fromSide)
     {
         return new StorageImportStrategy<>(
-            PNCCapabilities.AIR_HANDLER_MACHINE,
+            PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY,
             AirHandlerStrategy.INSTANCE,
             level,
             fromPos,
@@ -160,12 +114,14 @@ public class AEPlugin
 
     public static StackExportStrategy createAirExport(ServerLevel level, BlockPos fromPos, Direction fromSide)
     {
+        // 不知道为什么1.20.1的StorageExportStrategy的可见性被设为protected
+        // 但是对比了其与1.21.1版本的实现，继续用使用应该没有问题，这里使用一个最小继承来绕过
         return new StorageExportStrategy<>(
-                PNCCapabilities.AIR_HANDLER_MACHINE,
+                PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY,
                 AirHandlerStrategy.INSTANCE,
                 level,
                 fromPos,
                 fromSide
-        );
+        ){};
     }
 }
