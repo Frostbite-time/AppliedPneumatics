@@ -7,13 +7,14 @@ import com.wintercogs.appliedpneumatics.common.me.keys.AirKey;
 import com.wintercogs.appliedpneumatics.util.APMath;
 import com.wintercogs.appliedpneumatics.util.AirHandlerHelper;
 import me.desht.pneumaticcraft.api.PNCCapabilities;
-import me.desht.pneumaticcraft.api.tileentity.IAirHandler;
+import me.desht.pneumaticcraft.api.tileentity.IAirHandlerItem;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.common.SoundActions;
+import net.minecraftforge.common.SoundActions;
+import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 
 public class AirContainerItemStrategy implements ContainerItemStrategy<AirKey, AirContainerItemStrategy.Context>
@@ -22,16 +23,16 @@ public class AirContainerItemStrategy implements ContainerItemStrategy<AirKey, A
     @Override
     public @Nullable GenericStack getContainedStack(ItemStack stack)
     {
-        IAirHandler airHandler = stack.getCapability(PNCCapabilities.AIR_HANDLER_ITEM);
-        if (airHandler != null && airHandler.getAir() > 0)
-            return new GenericStack(AirKey.INSTANCE, airHandler.getAir());
-        return null;
+        return stack.getCapability(PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY)
+                .filter(handler -> handler.getAir() > 0)
+                .map(handler -> new GenericStack(AirKey.INSTANCE, handler.getAir()))
+                .orElse(null);
     }
 
     @Override
     public @Nullable AirContainerItemStrategy.Context findCarriedContext(Player player, AbstractContainerMenu menu)
     {
-        if (menu.getCarried().getCapability(PNCCapabilities.AIR_HANDLER_ITEM) != null)
+        if (menu.getCarried().getCapability(PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY).isPresent())
         {
             return new AirContainerItemStrategy.CarriedContext(player, menu);
         }
@@ -41,7 +42,7 @@ public class AirContainerItemStrategy implements ContainerItemStrategy<AirKey, A
     @Override
     public @Nullable AirContainerItemStrategy.Context findPlayerSlotContext(Player player, int slot)
     {
-        if (player.getInventory().getItem(slot).getCapability(PNCCapabilities.AIR_HANDLER_ITEM) != null)
+        if (player.getInventory().getItem(slot).getCapability(PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY).isPresent())
         {
             return new AirContainerItemStrategy.PlayerInvContext(player, slot);
         }
@@ -53,23 +54,28 @@ public class AirContainerItemStrategy implements ContainerItemStrategy<AirKey, A
     public long extract(AirContainerItemStrategy.Context context, AirKey what, long amount, Actionable mode)
     {
         if (amount <= 0) return 0;
-        ItemStack stack = context.getStack();
-        ItemStack copy = stack.copyWithCount(1);
-        IAirHandler airHandler = copy.getCapability(PNCCapabilities.AIR_HANDLER_ITEM);
-        if (airHandler == null)
-        {
-            return 0;
-        }
 
-        long available = Math.max(0, airHandler.getAir());
-        long wantExtract = Math.min(available, amount);
-        int maxExtract = APMath.ClampToInt(wantExtract);
-        if(!mode.isSimulate() && maxExtract > 0)
+        ItemStack stack = context.getStack();
+        ItemStack copy  = stack.copyWithCount(1);
+
+        LazyOptional<IAirHandlerItem> opt = copy.getCapability(PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY);
+
+        int maxExtract = opt
+                .map(handler ->
+                {
+                    long available = Math.max(0L, handler.getAir());
+                    long want = Math.min(available, amount);
+                    return APMath.ClampToInt(want);
+                })
+                .orElse(0);
+
+        if (!mode.isSimulate() && maxExtract > 0)
         {
             stack.shrink(1);
-            airHandler.addAir(-maxExtract);
+            opt.ifPresent(handler -> handler.addAir(-maxExtract));
             context.addOverflow(copy);
         }
+
         return maxExtract;
     }
 
@@ -77,22 +83,29 @@ public class AirContainerItemStrategy implements ContainerItemStrategy<AirKey, A
     public long insert(AirContainerItemStrategy.Context context, AirKey what, long amount, Actionable mode)
     {
         if (amount <= 0) return 0;
-        ItemStack stack = context.getStack();
-        ItemStack copy = stack.copyWithCount(1);
-        IAirHandler airHandler = copy.getCapability(PNCCapabilities.AIR_HANDLER_ITEM);
-        if (airHandler == null) {
-            return 0;
-        }
 
-        long space = Math.max(0, AirHandlerHelper.getMaxAirInAirHandler(airHandler) - airHandler.getAir());
-        long wantInsert = Math.min(space, amount);
-        int maxInsert = APMath.ClampToInt(wantInsert);
-        if(!mode.isSimulate() && maxInsert > 0)
+        ItemStack stack = context.getStack();
+        ItemStack copy  = stack.copyWithCount(1);
+
+        LazyOptional<IAirHandlerItem> opt = copy.getCapability(PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY);
+
+        int maxInsert = opt
+                .map(handler ->
+                {
+                    long capacity = AirHandlerHelper.getMaxAirInAirHandler(handler);
+                    long space = Math.max(0L, capacity - handler.getAir());
+                    long want = Math.min(space, amount);
+                    return APMath.ClampToInt(want);
+                })
+                .orElse(0);
+
+        if (!mode.isSimulate() && maxInsert > 0)
         {
             stack.shrink(1);
-            airHandler.addAir(maxInsert);
+            opt.ifPresent(handler -> handler.addAir(maxInsert));
             context.addOverflow(copy);
         }
+
         return maxInsert;
     }
 

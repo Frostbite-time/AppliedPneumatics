@@ -1,6 +1,5 @@
 package com.wintercogs.appliedpneumatics.common.me.p2p;
 
-
 import appeng.api.parts.IPartItem;
 import appeng.api.parts.IPartModel;
 import appeng.items.parts.PartModels;
@@ -14,7 +13,6 @@ import me.desht.pneumaticcraft.api.tileentity.IAirHandlerMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -22,12 +20,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,10 +52,14 @@ public class AirP2PTunnelPart extends P2PTunnelPart<AirP2PTunnelPart>
         return MODELS.getModel(this.isPowered(), this.isActive());
     }
 
-    private static final BlockCapability<IAirHandlerMachine, Direction> AIR_CAP =
-            PNCCapabilities.AIR_HANDLER_MACHINE;
+    private static final Capability<IAirHandlerMachine> AIR_CAP =
+            PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY;
 
-    private @Nullable BlockCapabilityCache<IAirHandlerMachine, Direction> inputAdjacentCache;
+    /** 端口自己的能力 */
+    LazyOptional<IAirHandlerMachine> opt = LazyOptional.empty();
+
+    /** 端口所对的方块的能力缓存 */
+    private @NotNull LazyOptional<IAirHandlerMachine> inputAdjacentCache = LazyOptional.empty();
 
     // —— 递归保护，避免极端情况下的重入查询 ——
     private int reentryDepth = 0;
@@ -76,6 +78,18 @@ public class AirP2PTunnelPart extends P2PTunnelPart<AirP2PTunnelPart>
         return isOutput() ? outputHandler : inputHandler;
     }
 
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> capabilityClass)
+    {
+        if(capabilityClass == AIR_CAP)
+        {
+            if(!opt.isPresent())
+                opt = LazyOptional.of(this::getExposedApi);
+            return opt.cast();
+        }
+        return super.getCapability(capabilityClass);
+    }
+
     /** 仅在“输入端实例”上调用：解析输入端所面对邻格的真实 IAirHandlerMachine，可能为 null。 */
     private @Nullable IAirHandlerMachine resolveInputAdjacentOrNull()
     {
@@ -88,16 +102,19 @@ public class AirP2PTunnelPart extends P2PTunnelPart<AirP2PTunnelPart>
             if (level == null) return null;
 
             if (level instanceof ServerLevel sl) {
-                if (inputAdjacentCache == null) {
+                if (!inputAdjacentCache.isPresent()) {
                     BlockPos relativedPos = be.getBlockPos().relative(side);
                     Direction face = side.getOpposite();
-                    inputAdjacentCache = BlockCapabilityCache.create(AIR_CAP, sl, relativedPos, face);
+                    BlockEntity blockEntity = level.getBlockEntity(relativedPos);
+                    if (blockEntity == null) return null;
+
+                    inputAdjacentCache = blockEntity.getCapability(AIR_CAP, face);
                 }
-                return inputAdjacentCache.getCapability();
+                return inputAdjacentCache.resolve().orElse(null);
             } else {
                 BlockEntity nbe = level.getBlockEntity(be.getBlockPos().relative(side));
                 if (nbe == null) return null;
-                return PNCCapabilities.getAirHandler(nbe, side.getOpposite()).orElse(null);
+                return nbe.getCapability(AIR_CAP, side.getOpposite()).resolve().orElse(null);
             }
         }
         finally
@@ -117,22 +134,27 @@ public class AirP2PTunnelPart extends P2PTunnelPart<AirP2PTunnelPart>
 
         BlockPos relativedPos = be.getBlockPos().relative(face);
         Direction capSide = face.getOpposite();
-        return level.getCapability(AIR_CAP, relativedPos, capSide);
+        BlockEntity blockEntity = level.getBlockEntity(relativedPos);
+        if (blockEntity == null) return null;
+        return blockEntity.getCapability(AIR_CAP, capSide).resolve().orElse(null);
     }
 
 
-    // 处理能力失效
+
     /** 输入端相邻能力失效 / 网络或邻居变化 → 失效并清缓存，让外界重新拿实例 */
-    private void resetInputAdjacentCacheAndInvalidate() {
-        inputAdjacentCache = null;
+    private void resetInputAdjacentCacheAndInvalidate()
+    {
+        if(opt.isPresent()) opt.invalidate();
+        opt = LazyOptional.empty();
+        inputAdjacentCache = LazyOptional.empty(); // 虽然我感觉可能不需要清理缓存，但是我打算在此保留与1.21.1最大相似度
         // 自己
-        getBlockEntity().invalidateCapabilities();
+        getBlockEntity().invalidateCaps();
         // 输入端 → 让所有输出端一起失效；输出端 → 让输入端失效
         if (!isOutput()) {
-            for (var out : getOutputs()) out.getBlockEntity().invalidateCapabilities();
+            for (var out : getOutputs()) out.getBlockEntity().invalidateCaps();
         } else {
             var in = getInput();
-            if (in != null) in.getBlockEntity().invalidateCapabilities();
+            if (in != null) in.getBlockEntity().invalidateCaps();
         }
     }
     @Override public void onTunnelNetworkChange() { resetInputAdjacentCacheAndInvalidate(); }
@@ -141,7 +163,6 @@ public class AirP2PTunnelPart extends P2PTunnelPart<AirP2PTunnelPart>
     @Override public void onUpdateShape(Direction side) {
         if (side == getSide()) resetInputAdjacentCacheAndInvalidate();
     }
-
 
     // 输入端在接收到气体时将其按权重推送到每个输出端
     // 权重即为（连接到输入端的气压 - 连接到对应输出端的气压）
@@ -254,10 +275,9 @@ public class AirP2PTunnelPart extends P2PTunnelPart<AirP2PTunnelPart>
         @Override public void  setSideLeaking(@Nullable Direction dir) { /* no-op */ }
         @Override public @Nullable Direction getSideLeaking() { return null; }
         @Override public List<IAirHandlerMachine.Connection> getConnectedAirHandlers(BlockEntity ownerTE){ return List.of(); }
-        @Override public void  setConnectableFaces(Collection<Direction> sides){ /* no-op */ }
-        @Override public Tag   serializeNBT(){ return new CompoundTag(); }
+        @Override public void setConnectedFaces(List<Direction> list) {}
+        @Override public CompoundTag  serializeNBT(){ return new CompoundTag(); }
         @Override public void  deserializeNBT(CompoundTag tag){ }
-        @Override public void  addPendingAir(int pendingAir){ /* no-op */ }
         @Override public void  printManometerMessage(Player p, List<Component> curInfo) {
             curInfo.add(Component.translatable("appliedpneumatics.cur.tooltip.p2p_input", String.format(Locale.ROOT, "%.2f", getPressure())));
         }
@@ -290,10 +310,9 @@ public class AirP2PTunnelPart extends P2PTunnelPart<AirP2PTunnelPart>
         @Override public void  setSideLeaking(@Nullable Direction dir) { /* no-op */ }
         @Override public @Nullable Direction getSideLeaking() { return null; }
         @Override public List<IAirHandlerMachine.Connection> getConnectedAirHandlers(BlockEntity ownerTE){ return List.of(); }
-        @Override public void  setConnectableFaces(Collection<Direction> sides){ /* no-op */ }
-        @Override public Tag   serializeNBT(){ return new CompoundTag(); }
+        @Override public void setConnectedFaces(List<Direction> list) {}
+        @Override public CompoundTag   serializeNBT(){ return new CompoundTag(); }
         @Override public void  deserializeNBT(CompoundTag tag){ }
-        @Override public void  addPendingAir(int pendingAir){ /* no-op */ }
         @Override public void  printManometerMessage(Player p, List<Component> curInfo) {
             curInfo.add(Component.translatable("appliedpneumatics.cur.tooltip.p2p_output", String.format(Locale.ROOT, "%.2f", getPressure())));
         }

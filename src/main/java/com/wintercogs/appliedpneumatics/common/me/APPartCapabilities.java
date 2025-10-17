@@ -4,54 +4,42 @@ import appeng.parts.automation.ExportBusPart;
 import appeng.parts.automation.ImportBusPart;
 import appeng.parts.storagebus.StorageBusPart;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
-import com.wintercogs.appliedpneumatics.common.me.p2p.AirP2PTunnelPart;
-import com.wintercogs.appliedpneumatics.common.me.p2p.HeatP2PTunnelPart;
 import it.unimi.dsi.fastutil.floats.FloatPredicate;
 import me.desht.pneumaticcraft.api.PNCCapabilities;
 import me.desht.pneumaticcraft.api.tileentity.IAirHandlerMachine;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-@EventBusSubscriber(modid = AppliedPneumatics.MODID, bus = EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = AppliedPneumatics.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class APPartCapabilities
 {
+    // TODO 看起来这几个地方没法轻易移植了，也许必须考虑mixin或者使用能力附加事件
     @SubscribeEvent
-    public static void registerPartCaps(RegisterPartCapabilitiesEvent event) {
+    public static void registerPartCaps(RegisterPartCapabilitiesEvent event)
+    {
         event.register(
-                PNCCapabilities.AIR_HANDLER_MACHINE,
-                (part, side) -> part.getExposedApi(),
-                AirP2PTunnelPart.class
-        );
-
-        event.register(
-                PNCCapabilities.HEAT_EXCHANGER_BLOCK,
-                (part, direction) -> part.getExposedApi(),
-                HeatP2PTunnelPart.class
-        );
-
-        event.register(
-                PNCCapabilities.AIR_HANDLER_MACHINE,
+                PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY,
                 (part, direction) -> new EmptyAirHandlerMachine(),
                 ExportBusPart.class
         );
 
         event.register(
-                PNCCapabilities.AIR_HANDLER_MACHINE,
+                PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY,
                 (part, direction) -> new EmptyAirHandlerMachine(),
                 ImportBusPart.class
         );
 
         event.register(
-                PNCCapabilities.AIR_HANDLER_MACHINE,
+                PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY,
                 (part, direction) -> new EmptyAirHandlerMachine(),
                 StorageBusPart.class
         );
@@ -83,10 +71,9 @@ public class APPartCapabilities
         @Override public void  setSideLeaking(@Nullable Direction dir) { /* no-op */ }
         @Override public @Nullable Direction getSideLeaking() { return null; }
         @Override public List<Connection> getConnectedAirHandlers(BlockEntity ownerTE){ return List.of(); }
-        @Override public void  setConnectableFaces(Collection<Direction> sides){ /* no-op */ }
-        @Override public Tag serializeNBT(){ return new CompoundTag(); }
+        @Override public void setConnectedFaces(List<Direction> list) {}
+        @Override public CompoundTag serializeNBT(){ return new CompoundTag(); }
         @Override public void  deserializeNBT(CompoundTag tag){ }
-        @Override public void  addPendingAir(int pendingAir){ /* no-op */ }
         @Override public void  printManometerMessage(Player p, List<Component> curInfo) {
             curInfo.add(Component.translatable("appliedpneumatics.cur.tooltip.nothing", String.format(Locale.ROOT, "%.2f", getPressure())));
         }

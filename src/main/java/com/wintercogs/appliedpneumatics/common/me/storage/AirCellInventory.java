@@ -17,6 +17,7 @@ import com.wintercogs.appliedpneumatics.common.init.APItems;
 import com.wintercogs.appliedpneumatics.common.items.IAirStorageCell;
 import com.wintercogs.appliedpneumatics.common.me.keys.AirKey;
 import com.wintercogs.appliedpneumatics.common.me.keys.types.AirKeyType;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -27,12 +28,14 @@ import java.lang.reflect.Field;
 
 public class AirCellInventory implements StorageCell
 {
+    private static final String AIR_STORED_TAG = "air_stored";
+
     private long storedAir; // 内部缓存，操作时立即写回到 itemStack，persist 基本是空操作
 
-    private final ItemStack itemStack;      // 实际存储载体
+    private final ItemStack itemStack; // 实际存储载体
     private final IAirStorageCell cellType;  // 提供 idleDrain / totalBytes / upgrades
     @Nullable
-    private final ISaveProvider host; // 新增
+    private final ISaveProvider host;
     @Nullable
     private final APDelayedBreaker.BlockKey hostPos; // 炸了它 XD
 
@@ -57,8 +60,8 @@ public class AirCellInventory implements StorageCell
 
         // StorageCell的构建方法只会在插入驱动器的一瞬间触发
         // 这里一次性获取状态即可
-        this.hasSecurityUpgrade = cellType.getUpgrades(itemStack).isInstalled(APItems.SECURITY_CARD);
-        this.hasVacuumUpgrade   = cellType.getUpgrades(itemStack).isInstalled(APItems.VACUUM_CARD);
+        this.hasSecurityUpgrade = cellType.getUpgrades(itemStack).isInstalled(APItems.SECURITY_CARD.get());
+        this.hasVacuumUpgrade   = cellType.getUpgrades(itemStack).isInstalled(APItems.VACUUM_CARD.get());
     }
 
 
@@ -77,10 +80,12 @@ public class AirCellInventory implements StorageCell
     }
 
     @Override
-    public void persist() {
-        if (!isPersisted) {
-            if (storedAir <= 0) itemStack.remove(APDataComponents.AIR_STORED);
-            else itemStack.set(APDataComponents.AIR_STORED, storedAir);
+    public void persist()
+    {
+        if (!isPersisted)
+        {
+            CompoundTag tag = itemStack.getOrCreateTag();
+            tag.putLong(AIR_STORED_TAG, storedAir);
             isPersisted = true;
         }
     }
@@ -233,12 +238,20 @@ public class AirCellInventory implements StorageCell
 
     public long getAirFromStack()
     {
-        return itemStack.getOrDefault(APDataComponents.AIR_STORED, 0L);
+        CompoundTag tag = itemStack.getOrCreateTag();
+        if(tag.contains(AIR_STORED_TAG))
+        {
+            return tag.getLong(AIR_STORED_TAG);
+        }
+        writeAirToStack(0);
+        return 0;
     }
 
     private void writeAirToStack(long value)
     {
-        itemStack.set(APDataComponents.AIR_STORED, Math.max(0, value));
+        long air = Math.max(0, value);
+        CompoundTag tag = itemStack.getOrCreateTag();
+        tag.putLong(AIR_STORED_TAG, air);
     }
 
     public static @Nullable BlockEntity tryGetHostBE(ISaveProvider host) {

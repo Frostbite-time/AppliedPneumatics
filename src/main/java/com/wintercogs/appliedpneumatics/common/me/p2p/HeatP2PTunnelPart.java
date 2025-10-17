@@ -25,7 +25,9 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -52,11 +54,13 @@ public class HeatP2PTunnelPart extends P2PTunnelPart<HeatP2PTunnelPart>
     @Override
     public IPartModel getStaticModels() { return MODELS.getModel(this.isPowered(), this.isActive()); }
 
+    private static final Capability<IHeatExchangerLogic> HEAT_CAP = PNCCapabilities.HEAT_EXCHANGER_CAPABILITY;
 
-    private static final BlockCapability<IHeatExchangerLogic, Direction> HEAT_CAP = PNCCapabilities.HEAT_EXCHANGER_BLOCK;
+    /** 端口自己的能力 */
+    LazyOptional<IHeatExchangerLogic> opt = LazyOptional.empty();
 
-    // 输入端面对的邻居的能力缓存
-    private @Nullable IHeatExchangerLogic inputAdjacentCache;
+    /** 输入端面对的邻居的能力缓存 */
+    private @NotNull LazyOptional<IHeatExchangerLogic> inputAdjacentCache = LazyOptional.empty();
 
     // 递归保护
     private int reentryDepth = 0;
@@ -71,8 +75,21 @@ public class HeatP2PTunnelPart extends P2PTunnelPart<HeatP2PTunnelPart>
     }
 
     /** P2P 对外提供的能力实例 */
-    public IHeatExchangerLogic getExposedApi() {
+    public IHeatExchangerLogic getExposedApi()
+    {
         return isOutput() ? outputHandler : inputHandler;
+    }
+
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> capabilityClass)
+    {
+        if(capabilityClass == HEAT_CAP)
+        {
+            if(!opt.isPresent())
+                opt = LazyOptional.of(this::getExposedApi);
+            return opt.cast();
+        }
+        return super.getCapability(capabilityClass);
     }
 
     /** 仅“输入端实例”使用：解析输入端所面对邻格的真实热量逻辑，可能为 null。 */
@@ -87,17 +104,17 @@ public class HeatP2PTunnelPart extends P2PTunnelPart<HeatP2PTunnelPart>
             if (level == null) return null;
 
             if (level instanceof ServerLevel sl) {
-                if(inputAdjacentCache == null)
+                if(!inputAdjacentCache.isPresent())
                 {
                     BlockPos relativedPos = be.getBlockPos().relative(face);
                     Direction capSide = face.getOpposite();
-                    inputAdjacentCache = HeatExchangerManager.getInstance().getLogic(sl, relativedPos, capSide).orElse(null);
+                    inputAdjacentCache = HeatExchangerManager.getInstance().getLogic(sl, relativedPos, capSide);
                 }
-                return inputAdjacentCache;
+                return inputAdjacentCache.resolve().orElse(null);
             } else {
                 BlockPos relativedPos = be.getBlockPos().relative(face);
                 Direction capSide = face.getOpposite();
-                return HeatExchangerManager.getInstance().getLogic(level, relativedPos, capSide).orElse(null);
+                return HeatExchangerManager.getInstance().getLogic(level, relativedPos, capSide).resolve().orElse(null);
             }
         } finally {
             reentryDepth--;
@@ -115,25 +132,28 @@ public class HeatP2PTunnelPart extends P2PTunnelPart<HeatP2PTunnelPart>
 
         BlockPos relativedPos = be.getBlockPos().relative(face);
         Direction capSide = face.getOpposite();
-        return HeatExchangerManager.getInstance().getLogic(level, relativedPos, capSide).orElse(null);
+        return HeatExchangerManager.getInstance().getLogic(level, relativedPos, capSide).resolve().orElse(null);
     }
 
     // —— 网络/邻居变化：统一失效缓存并让两侧重新拿能力 —— //
-    private void resetInputAdjacentCacheAndInvalidate() {
-        inputAdjacentCache = null;
+    private void resetInputAdjacentCacheAndInvalidate()
+    {
+        if(opt.isPresent()) opt.invalidate();
+        opt = LazyOptional.empty();
+        inputAdjacentCache = LazyOptional.empty();
         var be = getBlockEntity();
-        if (be != null) be.invalidateCapabilities();
+        if (be != null) be.invalidateCaps();
 
         if (!isOutput()) {
             for (var out : getOutputs()) {
                 var obe = out.getBlockEntity();
-                if (obe != null) obe.invalidateCapabilities();
+                if (obe != null) obe.invalidateCaps();
             }
         } else {
             var in = getInput();
             if (in != null) {
                 var ibe = in.getBlockEntity();
-                if (ibe != null) ibe.invalidateCapabilities();
+                if (ibe != null) ibe.invalidateCaps();
             }
         }
     }
