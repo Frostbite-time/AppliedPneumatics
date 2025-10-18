@@ -2,8 +2,6 @@ package com.wintercogs.appliedpneumatics.common.me.keys;
 
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.AEKeyType;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.common.me.keys.types.AirKeyType;
 import net.minecraft.core.BlockPos;

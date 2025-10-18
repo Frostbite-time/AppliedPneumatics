@@ -18,6 +18,6 @@ public class AppliedPneumaticsClient
 
     public static void clientRegister(IEventBus modBus, IEventBus gameBus)
     {
-
+        AEClientPlugin.registerStorageLED(modBus);
     }
 }

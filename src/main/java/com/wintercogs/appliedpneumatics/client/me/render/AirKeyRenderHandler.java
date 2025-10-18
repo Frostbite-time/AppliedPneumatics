@@ -21,7 +21,7 @@ public class AirKeyRenderHandler implements AEKeyRenderHandler<AirKey>
 {
     /** PNC 空气粒子整图 32×32 */
     private static final ResourceLocation AIR_PARTICLE_TEX =
-            ResourceLocation.fromNamespaceAndPath("pneumaticcraft", "textures/particle/air_particle.png");
+            new ResourceLocation("pneumaticcraft", "textures/particle/air_particle.png");
 
     /** 槽位尺寸 */
     private static final int SLOT_SIZE = 16;

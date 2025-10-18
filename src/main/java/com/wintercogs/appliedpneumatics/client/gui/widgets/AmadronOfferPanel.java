@@ -3,7 +3,7 @@ package com.wintercogs.appliedpneumatics.client.gui.widgets;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.util.IngredientRenderer;
 import me.desht.pneumaticcraft.api.crafting.AmadronTradeResource;
-import me.desht.pneumaticcraft.common.recipes.amadron.AmadronOffer;
+import me.desht.pneumaticcraft.api.crafting.recipe.AmadronRecipe;
 import me.desht.pneumaticcraft.common.recipes.amadron.AmadronPlayerOffer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -15,7 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -26,8 +26,7 @@ import java.util.Optional;
 
 public class AmadronOfferPanel extends AbstractWidget
 {
-    private static final ResourceLocation BG =
-            ResourceLocation.fromNamespaceAndPath(AppliedPneumatics.MODID, "textures/gui/amadron_wireless_terminal.png");
+    private static final ResourceLocation BG = AppliedPneumatics.makeId("textures/gui/amadron_wireless_terminal.png");
 
     private static final Bounds staticOfferUVBounds = new Bounds(95, 282, 8, 11);
     private static final Bounds villagerOfferUVBounds = new Bounds(83, 282, 8, 11);
@@ -67,7 +66,7 @@ public class AmadronOfferPanel extends AbstractWidget
     private final boolean valid;
 
     // 仅允许通过工厂创建
-    private AmadronOfferPanel(int x, int y, ResourceLocation offerId, @Nullable AmadronOffer offer, @Nullable onPress onClicked)
+    private AmadronOfferPanel(int x, int y, ResourceLocation offerId, @Nullable AmadronRecipe offer, @Nullable onPress onClicked)
     {
         super(x, y, PANEL_W, PANEL_H, Component.translatable("appliedpneumatics.gui.widget.amadron_offer_panel"));
         this.offerId = offerId;
@@ -76,7 +75,7 @@ public class AmadronOfferPanel extends AbstractWidget
         if (offer != null)
         {
             this.valid = true;
-            this.offerType = new OfferType(offer.isStaticOffer(), offer.isVillagerTrade(), offer instanceof AmadronPlayerOffer);
+            this.offerType = new OfferType(offer.isStaticOffer(), !offer.isStaticOffer() && !(offer instanceof AmadronPlayerOffer), offer instanceof AmadronPlayerOffer);
             this.input = offer.getInput();
             this.output = offer.getOutput();
             this.maxStock = offer.getStock();
@@ -116,7 +115,7 @@ public class AmadronOfferPanel extends AbstractWidget
     // （耦合度有点高，不过还能接受）
     public void onClicked(double mouseX, double mouseY, int button, boolean isShiftKeyDown)
     {
-        super.onClick(mouseX, mouseY, button);
+        super.onClick(mouseX, mouseY);
         if(button == GLFW.GLFW_MOUSE_BUTTON_LEFT || button == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
         {
             if(isShiftKeyDown)
@@ -304,7 +303,7 @@ public class AmadronOfferPanel extends AbstractWidget
             Component smallGray = Component.literal("OfferID: " + offerId)
                     .withStyle(Style.EMPTY
                             .withColor(ChatFormatting.DARK_GRAY)
-                            .withFont(ResourceLocation.fromNamespaceAndPath("minecraft", "uniform"))); // 小号字体
+                            .withFont(new ResourceLocation("minecraft", "uniform"))); // 小号字体
             tooltips.add(smallGray);
         }
 
@@ -335,7 +334,7 @@ public class AmadronOfferPanel extends AbstractWidget
         {
             var font = Minecraft.getInstance().font;
             var lines = new ArrayList<Component>(2);
-            lines.add(mayFluid.getHoverName());
+            lines.add(mayFluid.getDisplayName());
             lines.add(Component.literal(mayFluid.getAmount() + " mB").withStyle(net.minecraft.ChatFormatting.GRAY));
             gui.renderTooltip(font, lines, Optional.empty(), mouseX , mouseY );
         }

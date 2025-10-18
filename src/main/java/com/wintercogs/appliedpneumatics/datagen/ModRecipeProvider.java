@@ -4,48 +4,41 @@ import appeng.api.util.AEColor;
 import appeng.core.definitions.AEBlocks;
 import appeng.core.definitions.AEItems;
 import appeng.core.definitions.AEParts;
-import com.glodblock.github.extendedae.common.EAESingletons;
-import com.glodblock.github.extendedae.recipe.CrystalAssemblerRecipeBuilder;
 import com.google.common.collect.ImmutableList;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.common.init.APBlocks;
 import com.wintercogs.appliedpneumatics.common.init.APItems;
-import com.wintercogs.appliedpneumatics.datagen.builder.CellDisassemblyRecipeBuilder;
 import gripe._90.megacells.definition.MEGAItems;
 import me.desht.pneumaticcraft.api.crafting.AmadronTradeResource;
 import me.desht.pneumaticcraft.api.crafting.recipe.AssemblyRecipe;
-import me.desht.pneumaticcraft.common.registry.ModBlocks;
-import me.desht.pneumaticcraft.common.registry.ModItems;
+import me.desht.pneumaticcraft.common.core.ModBlocks;
+import me.desht.pneumaticcraft.common.core.ModItems;
 import me.desht.pneumaticcraft.common.upgrades.ModUpgrades;
 import me.desht.pneumaticcraft.datagen.recipe.AmadronRecipeBuilder;
 import me.desht.pneumaticcraft.datagen.recipe.AssemblyRecipeBuilder;
 import me.desht.pneumaticcraft.datagen.recipe.PressureChamberRecipeBuilder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.conditions.IConditionBuilder;
-import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
-import net.neoforged.neoforge.common.crafting.SizedIngredient;
+import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class ModRecipeProvider extends RecipeProvider implements IConditionBuilder
 {
 
-    public ModRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries)
+    public ModRecipeProvider(PackOutput output)
     {
-        super(output, registries);
+        super(output);
     }
 
     @Override
-    protected void buildRecipes(@NotNull RecipeOutput recipeOutput)
+    protected void buildRecipes(@NotNull Consumer<FinishedRecipe> recipeOutput)
     {
         // 外壳
         pressureChamber(ImmutableList.of(SizedIngredient.of(ModBlocks.PRESSURE_TUBE, 2),
@@ -565,19 +558,23 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     }
 
-    // 用于快速添加亚马龙交易
-    private RecipeBuilder amadronStatic(AmadronTradeResource in, AmadronTradeResource out) {
-        return (new AmadronRecipeBuilder(in, out, true, 0)).unlockedBy(getHasName((ItemLike)ModItems.AMADRON_TABLET.get()), has((ItemLike)ModItems.AMADRON_TABLET.get()));
+    // 用于快速添加亚马龙交易（改：返回 AmadronRecipeBuilder，使用 addCriterion）
+    private AmadronRecipeBuilder amadronStatic(AmadronTradeResource in, AmadronTradeResource out) {
+        return new AmadronRecipeBuilder(in, out, true, 0)
+                .addCriterion(getHasName(ModItems.AMADRON_TABLET.get()), has(ModItems.AMADRON_TABLET.get()));
     }
 
-    // 快速添加压力室配方
-    private RecipeBuilder pressureChamber(List<SizedIngredient> in, float pressure, ItemStack... out) {
-        return (new PressureChamberRecipeBuilder(in, pressure, out)).unlockedBy(getHasName((ItemLike)ModBlocks.PRESSURE_CHAMBER_VALVE.get()), has((ItemLike)ModBlocks.PRESSURE_CHAMBER_VALVE.get()));
+    // 快速添加压力室配方（改：返回 PressureChamberRecipeBuilder，使用 addCriterion）
+    private PressureChamberRecipeBuilder pressureChamber(List<Ingredient> in, float pressure, ItemStack... out) {
+        return new PressureChamberRecipeBuilder(in, pressure, out)
+                .addCriterion(getHasName(ModBlocks.PRESSURE_CHAMBER_VALVE.get()), has(ModBlocks.PRESSURE_CHAMBER_VALVE.get()));
     }
 
-    // 快速添加装配室配方
-    private RecipeBuilder assembly(SizedIngredient input, ItemStack output, AssemblyRecipe.AssemblyProgramType programType) {
-        return (new AssemblyRecipeBuilder(input, output, programType)).unlockedBy(getHasName((ItemLike)ModBlocks.ASSEMBLY_CONTROLLER.get()), has((ItemLike)ModBlocks.ASSEMBLY_CONTROLLER.get()));
+    // 快速添加装配室配方（改：返回 AssemblyRecipeBuilder，使用 addCriterion）
+    private AssemblyRecipeBuilder assembly(Ingredient input, ItemStack output, AssemblyRecipe.AssemblyProgramType programType) {
+        return new AssemblyRecipeBuilder(input, output, programType)
+                .addCriterion(getHasName(ModBlocks.ASSEMBLY_CONTROLLER.get()), has(ModBlocks.ASSEMBLY_CONTROLLER.get()));
     }
+
 
 }

@@ -17,9 +17,9 @@ import com.wintercogs.appliedpneumatics.common.init.APMenus;
 import com.wintercogs.appliedpneumatics.common.items.AmadronWirelessTerminalItem;
 import com.wintercogs.appliedpneumatics.common.me.crafting.AmadronPatternDetails;
 import com.wintercogs.appliedpneumatics.common.menu.host.AmadronWirelessTerminalMenuHost;
+import me.desht.pneumaticcraft.api.crafting.recipe.AmadronRecipe;
 import me.desht.pneumaticcraft.common.amadron.AmadronOfferManager;
-import me.desht.pneumaticcraft.common.amadron.ImmutableBasket;
-import me.desht.pneumaticcraft.common.recipes.amadron.AmadronOffer;
+import me.desht.pneumaticcraft.common.amadron.ShoppingBasket;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -38,7 +38,7 @@ public class AmadronWirelessTerminalMenu extends UpgradeableMenu<AmadronWireless
     // 无需同步，双端均有气动自行处理
     private final List<ResourceLocation> offerIdsSnapshot = AmadronOfferManager.getInstance()
             .getActiveOffers().stream()
-            .map(AmadronOffer::getOfferId)
+            .map(AmadronRecipe::getId)
             .toList();
 
     // 构造：双端通用，由AE自行传递信息
@@ -47,13 +47,13 @@ public class AmadronWirelessTerminalMenu extends UpgradeableMenu<AmadronWireless
         super(APMenus.AMADRON_WIRELESS_TERMINAL_MENU.get(), id, playerInv, host);
 
         registerClientAction(submitOrderAction, ImmutableBasketArg.class, immutableBasketArg -> onSubmitOrder(immutableBasketArg.basket()));
-        registerClientAction(savePatternAction, String.class, offerId -> onSavePatternAction(ResourceLocation.parse(offerId)));
+        registerClientAction(savePatternAction, String.class, offerId -> onSavePatternAction(new ResourceLocation(offerId)));
     }
 
-    private void onSubmitOrder(ImmutableBasket basket)
+    private void onSubmitOrder(ShoppingBasket basket)
     {
         MEStorage storage = getHost().getInventory();
-        if (!getHost().getLinkStatus().connected() || storage == NullInventory.of())
+        if (!getHost().rangeCheck() || storage == NullInventory.of())
         {
             getPlayer().sendSystemMessage(Component.translatable("amadron.appliedpneumatics.order_fail.me_disconnected"));
             return;
@@ -86,7 +86,7 @@ public class AmadronWirelessTerminalMenu extends UpgradeableMenu<AmadronWireless
             int units = basket.getUnits(offerId);
             if (units <= 0) continue;
 
-            AmadronOffer offer = AmadronOfferManager.getInstance().getOffer(offerId);
+            AmadronRecipe offer = AmadronOfferManager.getInstance().getOffer(offerId);
             if (offer == null || !AmadronOfferManager.getInstance().isActive(offerId)) {
                 getPlayer().sendSystemMessage(Component.translatable("amadron.appliedpneumatics.order_fail.order_invaild", offerId.toString()));
                 return;
@@ -173,7 +173,7 @@ public class AmadronWirelessTerminalMenu extends UpgradeableMenu<AmadronWireless
         getPlayer().sendSystemMessage(Component.translatable("amadron.appliedpneumatics.order_success", totalUnits));
     }
 
-    public void sendSubmitOrderAction(ImmutableBasket basket)
+    public void sendSubmitOrderAction(ShoppingBasket basket)
     {
         sendClientAction(submitOrderAction, new ImmutableBasketArg(basket));
     }
@@ -217,6 +217,7 @@ public class AmadronWirelessTerminalMenu extends UpgradeableMenu<AmadronWireless
     @Override
     public boolean stillValid(@NotNull Player player)
     {
-        return getHost().isValid();
+        AmadronWirelessTerminalMenuHost host = getHost();
+        return super.stillValid(player) && host.rangeCheck() && host.getTerminalItem().getAECurrentPower(host.getItemStack()) > 0;
     }
 }

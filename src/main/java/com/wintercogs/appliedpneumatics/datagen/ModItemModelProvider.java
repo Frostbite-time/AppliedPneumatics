@@ -7,10 +7,10 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.client.model.generators.ModelProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraftforge.client.model.generators.ItemModelBuilder;
+import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.minecraftforge.client.model.generators.ModelProvider;
+import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class ModItemModelProvider extends ItemModelProvider
 {
@@ -33,16 +33,16 @@ public class ModItemModelProvider extends ItemModelProvider
         airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_16M.get());
         airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_64M.get());
         airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_256M.get());
-        portableAirCell(APItems.PORTABLE_AIR_CELL_1K, "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_1k");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_4K, "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_4k");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_16K, "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_16k");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_64K, "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_64k");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_256K, "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_256k");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_1M, "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_1m");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_4M, "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_4m");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_16M, "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_16m");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_64M, "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_64m");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_256M, "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_256m");
+        portableAirCell(APItems.PORTABLE_AIR_CELL_1K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_1k");
+        portableAirCell(APItems.PORTABLE_AIR_CELL_4K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_4k");
+        portableAirCell(APItems.PORTABLE_AIR_CELL_16K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_16k");
+        portableAirCell(APItems.PORTABLE_AIR_CELL_64K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_64k");
+        portableAirCell(APItems.PORTABLE_AIR_CELL_256K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_256k");
+        portableAirCell(APItems.PORTABLE_AIR_CELL_1M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_1m");
+        portableAirCell(APItems.PORTABLE_AIR_CELL_4M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_4m");
+        portableAirCell(APItems.PORTABLE_AIR_CELL_16M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_16m");
+        portableAirCell(APItems.PORTABLE_AIR_CELL_64M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_64m");
+        portableAirCell(APItems.PORTABLE_AIR_CELL_256M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_256m");
         basicItem(APItems.VOLUME_CARD.get());
         basicItem(APItems.SECURITY_CARD.get());
         basicItem(APItems.VACUUM_CARD.get());
@@ -83,7 +83,7 @@ public class ModItemModelProvider extends ItemModelProvider
      */
     private void allowExternalTexture(String path)
     {
-        ResourceLocation rl = ResourceLocation.parse(path);
+        ResourceLocation rl = new ResourceLocation(path);
         if (!rl.getNamespace().equals(AppliedPneumatics.MODID))
         {
             this.existingFileHelper.trackGenerated(rl, ModelProvider.TEXTURE);

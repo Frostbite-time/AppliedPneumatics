@@ -1,31 +1,25 @@
 package com.wintercogs.appliedpneumatics.common.me.crafting;
 
 import appeng.api.crafting.IPatternDetails;
-import appeng.api.crafting.PatternDetailsTooltip;
-import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
-import me.desht.pneumaticcraft.api.crafting.AmadronTradeResource;
+import me.desht.pneumaticcraft.api.crafting.recipe.AmadronRecipe;
 import me.desht.pneumaticcraft.common.amadron.AmadronOfferManager;
-import me.desht.pneumaticcraft.common.recipes.amadron.AmadronOffer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class AmadronPatternDetails implements IPatternDetails
 {
+    private static final String PATTERN_INFO_TAG_NAME = "amadron_pattern_info";
+
     private final AEItemKey definition;
 
     private final Input[] inputs;
-    private final List<GenericStack> outputs;
+    private final GenericStack[] outputs;
 
     private final ResourceLocation offerId;
 
@@ -33,16 +27,16 @@ public class AmadronPatternDetails implements IPatternDetails
     {
         this.definition = definition;
 
-        EncodedAmadronPattern pattern = definition.get(APDataComponents.AMADRON_PATTERN.get());
-
-        if(pattern == null)
+        if(!definition.hasTag() || !definition.getTag().contains(PATTERN_INFO_TAG_NAME))
             throw new IllegalArgumentException("Given item does not encode a processing pattern: " + definition);
 
-        AmadronOffer offer = AmadronOfferManager.getInstance().getOffer(pattern.offerId());
+        EncodedAmadronPattern pattern = EncodedAmadronPattern.fromNBT(definition.getTag().getCompound(PATTERN_INFO_TAG_NAME));
+
+        AmadronRecipe offer = AmadronOfferManager.getInstance().getOffer(pattern.offerId());
         if(offer == null)
             throw new IllegalArgumentException("Given item does not have an offer: " + definition);
 
-        this.offerId = offer.getOfferId();
+        this.offerId = offer.getId();
         ItemStack mayInputStackItem = offer.getInput().getItem();
         FluidStack mayInputStackFluid = offer.getInput().getFluid();
         GenericStack input = mayInputStackItem.isEmpty() ? GenericStack.fromFluidStack(mayInputStackFluid) : GenericStack.fromItemStack(mayInputStackItem);
@@ -51,7 +45,7 @@ public class AmadronPatternDetails implements IPatternDetails
         ItemStack mayOutputStackItem = offer.getOutput().getItem();
         FluidStack mayOutputStackFluid = offer.getOutput().getFluid();
         GenericStack output = mayOutputStackItem.isEmpty() ? GenericStack.fromFluidStack(mayOutputStackFluid) : GenericStack.fromItemStack(mayOutputStackItem);
-        outputs = new ArrayList<>(Collections.singleton(output));
+        outputs = new GenericStack[] {output};
     }
 
     public ResourceLocation getOfferId()
@@ -72,7 +66,7 @@ public class AmadronPatternDetails implements IPatternDetails
     }
 
     @Override
-    public List<GenericStack> getOutputs()
+    public GenericStack[] getOutputs()
     {
         return outputs;
     }
@@ -81,40 +75,7 @@ public class AmadronPatternDetails implements IPatternDetails
     {
         if(AmadronOfferManager.getInstance().getOffer(offerId) != null)
         {
-            stack.set(APDataComponents.AMADRON_PATTERN, new EncodedAmadronPattern(offerId));
-        }
-    }
-
-
-    public static PatternDetailsTooltip getInvalidPatternTooltip(ItemStack stack, Level level,
-                                                                 @Nullable Exception cause, TooltipFlag flags)
-    {
-        PatternDetailsTooltip tooltip = new PatternDetailsTooltip(PatternDetailsTooltip.OUTPUT_TEXT_PRODUCES);
-
-        var encodedPattern = stack.get(APDataComponents.AMADRON_PATTERN);
-        if (encodedPattern != null && AmadronOfferManager.getInstance().getOffer(encodedPattern.offerId()) != null)
-        {
-            addTooltipFromAmadronResource(tooltip, AmadronOfferManager.getInstance().getOffer(encodedPattern.offerId()).getInput(), true);
-            addTooltipFromAmadronResource(tooltip, AmadronOfferManager.getInstance().getOffer(encodedPattern.offerId()).getOutput(), false);
-        }
-        return tooltip;
-    }
-
-    private static void addTooltipFromAmadronResource(PatternDetailsTooltip tooltip, AmadronTradeResource resource, boolean toInput)
-    {
-        if(!resource.getItem().isEmpty())
-        {
-            if(toInput)
-                tooltip.addInput(AEItemKey.of(resource.getItem()), resource.getAmount());
-            else
-                tooltip.addOutput(AEItemKey.of(resource.getItem()), resource.getAmount());
-        }
-        else if(!resource.getFluid().isEmpty())
-        {
-            if(toInput)
-                tooltip.addInput(AEFluidKey.of(resource.getFluid()), resource.getAmount());
-            else
-                tooltip.addOutput(AEFluidKey.of(resource.getFluid()), resource.getAmount());
+            stack.getOrCreateTag().put(PATTERN_INFO_TAG_NAME, new EncodedAmadronPattern(offerId).toNBT());
         }
     }
 

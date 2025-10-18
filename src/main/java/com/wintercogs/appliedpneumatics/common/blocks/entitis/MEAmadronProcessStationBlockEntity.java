@@ -1,6 +1,6 @@
 package com.wintercogs.appliedpneumatics.common.blocks.entitis;
 
-import appeng.api.AECapabilities;
+import appeng.api.behaviors.GenericInternalInventory;
 import appeng.api.config.Actionable;
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.crafting.PatternDetailsHelper;
@@ -17,7 +17,8 @@ import appeng.api.upgrades.IUpgradeInventory;
 import appeng.api.upgrades.IUpgradeableObject;
 import appeng.api.upgrades.UpgradeInventories;
 import appeng.blockentity.ServerTickingBlockEntity;
-import appeng.blockentity.grid.AENetworkedBlockEntity;
+import appeng.blockentity.grid.AENetworkBlockEntity;
+import appeng.capabilities.Capabilities;
 import appeng.core.definitions.AEItems;
 import appeng.helpers.IPriorityHost;
 import appeng.helpers.externalstorage.GenericStackInv;
@@ -29,27 +30,25 @@ import appeng.util.inv.AppEngInternalInventory;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.api.GenericInv.CombinedGenericInternalInventory;
 import com.wintercogs.appliedpneumatics.api.GenericInv.GenericStackInvWrapper;
-import com.wintercogs.appliedpneumatics.common.init.APBlockEntities;
 import com.wintercogs.appliedpneumatics.common.init.APBlocks;
 import com.wintercogs.appliedpneumatics.common.init.APItems;
 import com.wintercogs.appliedpneumatics.common.init.APMenus;
 import com.wintercogs.appliedpneumatics.common.me.crafting.AmadronPatternDetails;
+import me.desht.pneumaticcraft.api.crafting.recipe.AmadronRecipe;
 import me.desht.pneumaticcraft.common.amadron.AmadronOfferManager;
 import me.desht.pneumaticcraft.common.amadron.AmadronUtil;
 import me.desht.pneumaticcraft.common.config.subconfig.AmadronPlayerOffers;
+import me.desht.pneumaticcraft.common.core.ModItems;
 import me.desht.pneumaticcraft.common.drone.DroneRegistry;
 import me.desht.pneumaticcraft.common.entity.drone.AmadroneEntity;
 import me.desht.pneumaticcraft.common.network.NetworkHandler;
 import me.desht.pneumaticcraft.common.network.PacketAmadronStockUpdate;
-import me.desht.pneumaticcraft.common.recipes.amadron.AmadronOffer;
 import me.desht.pneumaticcraft.common.recipes.amadron.AmadronPlayerOffer;
-import me.desht.pneumaticcraft.common.registry.ModDataComponents;
-import me.desht.pneumaticcraft.common.registry.ModItems;
+import me.desht.pneumaticcraft.common.util.GlobalPosHelper;
 import me.desht.pneumaticcraft.lib.Log;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -61,8 +60,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +70,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 // 大量的失败回退处理有重复代码，后续可以统一处理
-public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity implements IUpgradeableObject,
+public class MEAmadronProcessStationBlockEntity extends AENetworkBlockEntity implements IUpgradeableObject,
         ICraftingProvider, PatternContainer, ServerTickingBlockEntity, IPriorityHost
 {
 
@@ -81,7 +81,7 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
     /** 样板槽 - 只允许UI存取 */
     private final AppEngInternalInventory patternInventory;
     /** 升级卡仓，最多四个加速卡 */
-    private final IUpgradeInventory upgrades = UpgradeInventories.forMachine(APBlocks.ME_AMADRON_PROCESS_STATION, 4, () -> {});
+    private final IUpgradeInventory upgrades = UpgradeInventories.forMachine(APBlocks.ME_AMADRON_PROCESS_STATION.get(), 4, () -> {});
     /** 输入槽 - 供无人机拿取，允许能力系统对外输出 */
     private final GenericStackInv inputInv = new GenericStackInv(this::setChanged, 9);
     /** 输出槽 - 缓存，一旦收到物品，直接送回AE，允许能力系统输入 */
@@ -93,6 +93,9 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
 
     /** 用来判断亚马龙样版是否准备就绪，准备就绪后要求AE更新一次样板状态 */
     private boolean needAmadronRefresh = true;
+
+    // 能力缓存
+    private LazyOptional<GenericInternalInventory> invOpt = LazyOptional.empty();
 
     public MEAmadronProcessStationBlockEntity(BlockEntityType<? extends MEAmadronProcessStationBlockEntity> blockEntityType , BlockPos pos, BlockState blockState, int patternSize)
     {
@@ -126,109 +129,64 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
                 .addService(ICraftingProvider.class, this);
     }
 
-    /** 能力注册 */
-    public static void onRegisterCaps(RegisterCapabilitiesEvent event)
+    @Override
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side)
     {
-        event.registerBlockEntity(
-                AECapabilities.IN_WORLD_GRID_NODE_HOST,
-                APBlockEntities.ME_AMADRON_PROCESS_STATION_BLOCK_ENTITY.get(),
-                (be, unused) -> be
-        );
-        event.registerBlockEntity(
-                AECapabilities.IN_WORLD_GRID_NODE_HOST,
-                APBlockEntities.ME_AMADRON_EXTENDED_PROCESS_STATION_BLOCK_ENTITY.get(),
-                (be, unused) -> be
-        );
-
-        // 对外暴露GENERIC_INTERNAL_INV即可，AE会自动再注册物品、流体的适配器
-        event.registerBlockEntity(
-                AECapabilities.GENERIC_INTERNAL_INV,
-                APBlockEntities.ME_AMADRON_PROCESS_STATION_BLOCK_ENTITY.get(),
-                (be, direction) -> {
-                    GenericStackInvWrapper inputWrapper = new GenericStackInvWrapper(be.inputInv)
+        if(cap == Capabilities.GENERIC_INTERNAL_INV)
+        {
+            if(!invOpt.isPresent())
+            {
+                MEAmadronProcessStationBlockEntity be = this;
+                GenericStackInvWrapper inputWrapper = new GenericStackInvWrapper(this.inputInv)
+                {
+                    // 防止无人机从外部塞入交易结果
+                    @Override
+                    public long insert(int slot, AEKey what, long amount, Actionable mode)
                     {
-                        // 防止无人机从外部塞入交易结果
-                        @Override
-                        public long insert(int slot, AEKey what, long amount, Actionable mode)
-                        {
-                            return 0;
-                        }
-                    };
-                    GenericStackInvWrapper outputWrapper = new GenericStackInvWrapper(be.outputInv)
+                        return 0;
+                    }
+                };
+                GenericStackInvWrapper outputWrapper = new GenericStackInvWrapper(this.outputInv)
+                {
+                    @Override
+                    public long insert(int slot, AEKey what, long amount, Actionable mode)
                     {
-                        @Override
-                        public long insert(int slot, AEKey what, long amount, Actionable mode)
+                        // 任何意图塞入的物品，首先会尝试直接塞入ae内，剩余物塞入outputWrapper
+                        MEStorage storage = be.getNetworkInventory();
+                        long remaining = amount;
+                        long firstInsert = 0;
+                        if(storage != null)
                         {
-                            // 任何意图塞入的物品，首先会尝试直接塞入ae内，剩余物塞入outputWrapper
-                            MEStorage storage = be.getNetworkInventory();
-                            long remaining = amount;
-                            long firstInsert = 0;
-                            if(storage != null)
-                            {
-                                firstInsert = storage.insert(what, amount, mode, IActionSource.ofMachine(be));
-                                remaining = amount - firstInsert;
-                                if(remaining <= 0)
-                                    return amount;
-                            }
-
-                            return firstInsert + super.insert(slot, what, remaining, mode);
+                            firstInsert = storage.insert(what, amount, mode, IActionSource.ofMachine(be));
+                            remaining = amount - firstInsert;
+                            if(remaining <= 0)
+                                return amount;
                         }
 
-                        // 防止被无人机从中取出内容物
-                        @Override
-                        public long extract(int slot, AEKey what, long amount, Actionable mode)
-                        {
-                            return 0;
-                        }
-                    };
+                        return firstInsert + super.insert(slot, what, remaining, mode);
+                    }
 
-                    return new CombinedGenericInternalInventory(inputWrapper, outputWrapper);
-                }
-        );
-        event.registerBlockEntity(
-                AECapabilities.GENERIC_INTERNAL_INV,
-                APBlockEntities.ME_AMADRON_EXTENDED_PROCESS_STATION_BLOCK_ENTITY.get(),
-                (be, direction) -> {
-                    GenericStackInvWrapper inputWrapper = new GenericStackInvWrapper(be.inputInv)
+                    // 防止被无人机从中取出内容物
+                    @Override
+                    public long extract(int slot, AEKey what, long amount, Actionable mode)
                     {
-                        // 防止无人机从外部塞入交易结果
-                        @Override
-                        public long insert(int slot, AEKey what, long amount, Actionable mode)
-                        {
-                            return 0;
-                        }
-                    };
-                    GenericStackInvWrapper outputWrapper = new GenericStackInvWrapper(be.outputInv)
-                    {
-                        @Override
-                        public long insert(int slot, AEKey what, long amount, Actionable mode)
-                        {
-                            // 任何意图塞入的物品，首先会尝试直接塞入ae内，剩余物塞入outputWrapper
-                            MEStorage storage = be.getNetworkInventory();
-                            long remaining = amount;
-                            long firstInsert = 0;
-                            if(storage != null)
-                            {
-                                firstInsert = storage.insert(what, amount, mode, IActionSource.ofMachine(be));
-                                remaining = amount - firstInsert;
-                                if(remaining <= 0)
-                                    return amount;
-                            }
+                        return 0;
+                    }
+                };
+                invOpt = LazyOptional.of(() -> new CombinedGenericInternalInventory(inputWrapper, outputWrapper));
+            }
+            return invOpt.cast();
+        }
+        return super.getCapability(cap, side);
+    }
 
-                            return firstInsert + super.insert(slot, what, remaining, mode);
-                        }
+    @Override
+    public void invalidateCaps()
+    {
+        super.invalidateCaps();
 
-                        // 防止被无人机从中取出内容物
-                        @Override
-                        public long extract(int slot, AEKey what, long amount, Actionable mode)
-                        {
-                            return 0;
-                        }
-                    };
-
-                    return new CombinedGenericInternalInventory(inputWrapper, outputWrapper);
-                }
-        );
+        if(invOpt.isPresent()) invOpt.invalidate();
+        invOpt = LazyOptional.empty();
     }
 
     // getter----------------------------------------------------------------------------------
@@ -273,7 +231,7 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
     @Override
     public PatternContainerGroup getTerminalGroup()
     {
-        return new PatternContainerGroup(AEItemKey.of(APBlocks.ME_AMADRON_PROCESS_STATION), APBlocks.ME_AMADRON_PROCESS_STATION.get().getName(), List.of());
+        return new PatternContainerGroup(AEItemKey.of(APBlocks.ME_AMADRON_PROCESS_STATION.get()), APBlocks.ME_AMADRON_PROCESS_STATION.get().getName(), List.of());
     }
     /** 获取当前样板优先级 */
     @Override
@@ -313,29 +271,29 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
 
     // 持久化状态--------------------------------------------------------------------------------------------
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    public void saveAdditional(CompoundTag tag)
     {
-        super.saveAdditional(tag, registries);
-        patternInventory.writeToNBT(tag,"pattern_inv", registries);
-        inputInv.writeToChildTag(tag,"input_inv", registries);
-        outputInv.writeToChildTag(tag,"output_inv", registries);
-        upgrades.writeToNBT(tag,"upgrade_inv", registries);
+        super.saveAdditional(tag);
+        patternInventory.writeToNBT(tag,"pattern_inv");
+        inputInv.writeToChildTag(tag,"input_inv");
+        outputInv.writeToChildTag(tag,"output_inv");
+        upgrades.writeToNBT(tag,"upgrade_inv");
         tag.putInt("priority", priority);
 
         ListTag jobList = new ListTag();
         for (Job j : this.jobs) {
-            jobList.add(j.writeToSubTag(registries));
+            jobList.add(j.writeToSubTag());
         }
         tag.put("Jobs", jobList);
     }
     @Override
-    public void loadTag(CompoundTag tag, HolderLookup.Provider registries)
+    public void loadTag(CompoundTag tag)
     {
-        super.loadTag(tag, registries);
-        patternInventory.readFromNBT(tag,"pattern_inv", registries);
-        inputInv.readFromChildTag(tag,"input_inv", registries);
-        outputInv.readFromChildTag(tag,"output_inv", registries);
-        upgrades.readFromNBT(tag,"upgrade_inv", registries);
+        super.loadTag(tag);
+        patternInventory.readFromNBT(tag,"pattern_inv");
+        inputInv.readFromChildTag(tag,"input_inv");
+        outputInv.readFromChildTag(tag,"output_inv");
+        upgrades.readFromNBT(tag,"upgrade_inv");
         this.priority = tag.getInt("priority");
 
         this.jobs.clear();
@@ -343,7 +301,7 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
             ListTag jobList = tag.getList("Jobs", Tag.TAG_COMPOUND);
             for (int i = 0; i < jobList.size(); i++) {
                 CompoundTag jt = jobList.getCompound(i);
-                this.jobs.add(Job.readFromSubTag(jt, registries));
+                this.jobs.add(Job.readFromSubTag(jt));
             }
         }
     }
@@ -354,18 +312,21 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
         super.addAdditionalDrops(level, pos, drops);
 
         // 收集掉落物：样板槽、升级槽、两个仓库位
-        for (int i = 0; i < patternInventory.size(); i++) {
+        for (int i = 0; i < patternInventory.size(); i++)
+        {
             ItemStack s = patternInventory.getStackInSlot(i);
             if (!s.isEmpty()) drops.add(s.copy());
         }
-        for (int i = 0; i < upgrades.size(); i++) {
+        for (int i = 0; i < upgrades.size(); i++)
+        {
             ItemStack slotContent = upgrades.getStackInSlot(i);
             if (!slotContent.isEmpty()) drops.add(slotContent.copy());
         }
         Consumer<GenericStack> toDrops = (gs) -> {
             if (gs == null) return;
-            if (gs.what() instanceof AEItemKey itemKey) {
-                int amt = Math.clamp(gs.amount(), 0, Integer.MAX_VALUE);
+            if (gs.what() instanceof AEItemKey itemKey)
+            {
+                int amt = (int)Math.max(0, Math.min(gs.amount(), Integer.MAX_VALUE));
                 if (amt > 0) drops.add(itemKey.toStack(amt));
             }
         };
@@ -602,7 +563,7 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
 
 
             // 基于输出限制本次可派发的最大 units
-            AmadronOffer offer = AmadronOfferManager.getInstance().getOffer(offerId);
+            AmadronRecipe offer = AmadronOfferManager.getInstance().getOffer(offerId);
             int payloadUnitsLimit = computeMaxUnitsPerDrone(offer);
             if (payloadUnitsLimit <= 0) // 单订单超出可承载上限，此订单完全无法派发
             {
@@ -649,15 +610,16 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
 
             // 召唤无人机
             int units = selected.size();
-            GlobalPos here = new GlobalPos(this.level.dimension(), this.worldPosition);
+            GlobalPos here = GlobalPos.of(this.level.dimension(), this.worldPosition);
 
             AmadroneEntity drone = retrieveOrder(AppliedPneumatics.MODID, offer, units, here, here);
             if (drone != null)
             {
                 ItemStack tablet = new ItemStack(ModItems.AMADRON_TABLET.get(), 1);
-                tablet.set(ModDataComponents.AMADRON_ITEM_POS, here);
-                tablet.set(ModDataComponents.AMADRON_FLUID_POS, here);
-                drone.setHandlingOffer(offer.getOfferId(), units, tablet, AppliedPneumatics.MODID,
+                CompoundTag tag = tablet.getOrCreateTag();
+                tag.put("itemPos", GlobalPosHelper.toNBT(here));
+                tag.put("liquidPos", GlobalPosHelper.toNBT(here));
+                drone.setHandlingOffer(offer.getId(), units, tablet, AppliedPneumatics.MODID,
                         AmadroneEntity.AmadronAction.TAKING_PAYMENT);
 
                 usedThisRound.add(offerId);
@@ -723,13 +685,13 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
     }
 
     // 取一个亚马龙无人机
-    public static AmadroneEntity retrieveOrder(String playerName, AmadronOffer offer, int units, GlobalPos itemGPos, GlobalPos liquidGPos)
+    public static AmadroneEntity retrieveOrder(String playerName, AmadronRecipe offer, int units, GlobalPos itemGPos, GlobalPos liquidGPos)
     {
         boolean isAmadronRestock = playerName == null;
         return offer.getInput().apply((itemStack) -> retrieveOrderItems(playerName, offer, units, itemGPos, isAmadronRestock), (fluidStack) -> retrieveOrderFluid(playerName, offer, units, liquidGPos, isAmadronRestock));
     }
 
-    private static AmadroneEntity retrieveOrderFluid(String playerName, AmadronOffer offer, int units, GlobalPos liquidGPos, boolean isAmadronRestock) {
+    private static AmadroneEntity retrieveOrderFluid(String playerName, AmadronRecipe offer, int units, GlobalPos liquidGPos, boolean isAmadronRestock) {
         if (liquidGPos != null && validateStockLevel(playerName, offer, units, isAmadronRestock)) {
             FluidStack queryingFluid = AmadronUtil.buildFluidStack(offer.getInput().getFluid(), units);
             reduceStockLevel(offer, units, isAmadronRestock);
@@ -739,7 +701,7 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
         }
     }
 
-    private static AmadroneEntity retrieveOrderItems(String playerName, AmadronOffer offer, int units, GlobalPos itemGPos, boolean isAmadronRestock)
+    private static AmadroneEntity retrieveOrderItems(String playerName, AmadronRecipe offer, int units, GlobalPos itemGPos, boolean isAmadronRestock)
     {
         if (itemGPos != null && validateStockLevel(playerName, offer, units, isAmadronRestock)) {
             ItemStack queryingItems = offer.getInput().getItem();
@@ -756,7 +718,7 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
         }
     }
 
-    private static void reduceStockLevel(AmadronOffer offer, int units, boolean isAmadronRestock)
+    private static void reduceStockLevel(AmadronRecipe offer, int units, boolean isAmadronRestock)
     {
         if (!isAmadronRestock && (offer instanceof AmadronPlayerOffer || offer.getMaxStock() >= 0))
         {
@@ -766,11 +728,11 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
                 AmadronPlayerOffers.save();
             }
 
-            NetworkHandler.sendNonLocal(new PacketAmadronStockUpdate(offer.getOfferId(), offer.getStock()));
+            NetworkHandler.sendNonLocal(new PacketAmadronStockUpdate(offer.getId(), offer.getStock()));
         }
     }
 
-    public static boolean validateStockLevel(String playerName, AmadronOffer offer, int units, boolean isAmadronRestock)
+    public static boolean validateStockLevel(String playerName, AmadronRecipe offer, int units, boolean isAmadronRestock)
     {
         if (!isAmadronRestock && offer.getStock() >= 0 && units > offer.getStock()) {
             Log.warning("ignoring suspicious order from player [{}] for {} x {} - only {} in stock right now!", new Object[]{playerName, units, offer, offer.getStock()});
@@ -781,7 +743,7 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
     }
 
     /** 计算“仅由输出负载上限”允许的一次派发最大 units（与速度卡上限取 min） */
-    private static int computeMaxUnitsPerDrone(AmadronOffer offer)
+    private static int computeMaxUnitsPerDrone(AmadronRecipe offer)
     {
         ItemStack outItem = offer.getOutput().getItem();
         if (!outItem.isEmpty())
@@ -874,11 +836,11 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
     /** selfResource表示该Job自己携带了一部分资源，只有这部分资源被插入仓库才执行实际job */
     private record Job(ResourceLocation offerId, @NotNull GenericStack selfResource, @Nullable UUID player)
     {
-        private CompoundTag writeToSubTag(HolderLookup.Provider registries)
+        private CompoundTag writeToSubTag()
         {
             CompoundTag tag = new CompoundTag();
             tag.putString("offer", this.offerId.toString());
-            tag.put("resource", GenericStack.writeTag(registries, this.selfResource));
+            tag.put("resource", GenericStack.writeTag(this.selfResource));
 
             if(this.player != null)
                 tag.putString("player", this.player.toString());
@@ -886,10 +848,10 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
             return tag;
         }
 
-        public static Job readFromSubTag(CompoundTag tag, HolderLookup.Provider registries)
+        public static Job readFromSubTag(CompoundTag tag)
         {
-            ResourceLocation offer = ResourceLocation.parse(tag.getString("offer"));
-            GenericStack resource = GenericStack.readTag(registries, tag.getCompound("resource"));
+            ResourceLocation offer = new ResourceLocation(tag.getString("offer"));
+            GenericStack resource = GenericStack.readTag(tag.getCompound("resource"));
 
             UUID player = null;
             if (tag.contains("player"))

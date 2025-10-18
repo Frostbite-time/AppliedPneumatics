@@ -31,7 +31,7 @@ public class AppliedPneumatics
     public static final String MEGA_CELL_MODID = "megacells";
     public static boolean MEGA_CELL_LOADED = false;
 
-    public static final String EAE_MODID = "extendedae";
+    public static final String EAE_MODID = "expatternprovider";
     public static boolean EAE_LOADED = false;
 
 

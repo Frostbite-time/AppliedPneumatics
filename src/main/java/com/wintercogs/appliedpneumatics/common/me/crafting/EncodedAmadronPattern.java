@@ -1,23 +1,22 @@
 package com.wintercogs.appliedpneumatics.common.me.crafting;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 
 public record EncodedAmadronPattern(ResourceLocation offerId)
 {
-    public static final Codec<EncodedAmadronPattern> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ResourceLocation.CODEC.fieldOf("offerId").forGetter(EncodedAmadronPattern::offerId)
-    ).apply(instance, EncodedAmadronPattern::new));
+    public CompoundTag toNBT()
+    {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putString("offerId", offerId.toString());
+        return nbt;
+    }
 
-    public static final StreamCodec<FriendlyByteBuf, EncodedAmadronPattern> STREAM_CODEC =
-            StreamCodec.composite(
-                    ResourceLocation.STREAM_CODEC,
-                    EncodedAmadronPattern::offerId,
-                    EncodedAmadronPattern::new
-            );
+    public static EncodedAmadronPattern fromNBT(CompoundTag nbt)
+    {
+        String offerId = nbt.getString("offerId");
+        return new EncodedAmadronPattern(new ResourceLocation(offerId));
+    }
 
     @Override
     public boolean equals(Object obj)

@@ -10,14 +10,13 @@ import appeng.client.gui.widgets.IconButton;
 import appeng.client.gui.widgets.Scrollbar;
 import appeng.client.gui.widgets.SettingToggleButton;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
-import com.wintercogs.appliedpneumatics.client.gui.widgets.AE2TinyButton;
 import com.wintercogs.appliedpneumatics.client.gui.widgets.AmadronOfferPanel;
 import com.wintercogs.appliedpneumatics.common.menu.AmadronWirelessTerminalMenu;
+import me.desht.pneumaticcraft.api.crafting.recipe.AmadronRecipe;
 import me.desht.pneumaticcraft.common.amadron.AmadronOfferManager;
-import me.desht.pneumaticcraft.common.amadron.MutableBasket;
 import me.desht.pneumaticcraft.common.amadron.ShoppingBasket;
-import me.desht.pneumaticcraft.common.recipes.amadron.AmadronOffer;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -57,7 +56,7 @@ public class AmadronWirelessTerminalGUI extends UpgradeableScreen<AmadronWireles
     // 组件
     private final Scrollbar scrollbar;
     private final AETextField searchField;
-    private final AE2TinyButton submitButton;
+    private final Button submitButton;
     private final IconButton savePatternButton;
 
     // 状态
@@ -79,13 +78,13 @@ public class AmadronWirelessTerminalGUI extends UpgradeableScreen<AmadronWireles
         super(menu, playerInventory, title, StyleManager.loadStyleDoc("/screens/amadron_wireless_terminal.json"));
 
         // 滚动条
-        this.scrollbar = widgets.addScrollBar("scrollbar", Scrollbar.BIG);
+        this.scrollbar = widgets.addScrollBar("scrollbar", Scrollbar.DEFAULT);
 
         // 提交订单按钮
-        this.submitButton = new AE2TinyButton(
+        this.submitButton = Button.builder(
                 Component.translatable("menu.appliedpneumatics.button.submit"),
                 b -> onSubmit()
-        );
+        ).build();
         widgets.add("submit_button", this.submitButton);
 
         // 保存样板按钮
@@ -323,7 +322,7 @@ public class AmadronWirelessTerminalGUI extends UpgradeableScreen<AmadronWireles
         String needle = q.toLowerCase(Locale.ROOT);
         if (id.toString().toLowerCase(Locale.ROOT).contains(needle)) return true;
 
-        AmadronOffer offer = AmadronOfferManager.getInstance().getOffer(id);
+        AmadronRecipe offer = AmadronOfferManager.getInstance().getOffer(id);
         if (offer == null) return false;
 
         String inName = safeNameLower(offer, true);
@@ -332,7 +331,7 @@ public class AmadronWirelessTerminalGUI extends UpgradeableScreen<AmadronWireles
                 || (!outName.isEmpty() && outName.contains(needle));
     }
 
-    private static String safeNameLower(AmadronOffer offer, boolean input)
+    private static String safeNameLower(AmadronRecipe offer, boolean input)
     {
         try {
             String name = input ? offer.getInput().getName() : offer.getOutput().getName();
@@ -360,12 +359,12 @@ public class AmadronWirelessTerminalGUI extends UpgradeableScreen<AmadronWireles
     // 提交当前选中的所有交易
     private void onSubmit()
     {
-        MutableBasket basket = ShoppingBasket.createMutable();
+        ShoppingBasket basket = new ShoppingBasket();
         for (AmadronOfferPanel panel : pagePanels) {
             int want = panel.getWantedStock();
             if (want > 0) basket.addUnitsToOffer(panel.getOfferId(), want);
         }
-        menu.sendSubmitOrderAction(basket.toImmutable());
+        menu.sendSubmitOrderAction(basket);
     }
 
     @Override

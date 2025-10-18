@@ -9,12 +9,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.client.model.generators.VariantBlockStateBuilder;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.registries.DeferredBlock;
+import net.minecraftforge.client.model.generators.BlockStateProvider;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
+import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.client.model.generators.VariantBlockStateBuilder;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.RegistryObject;
 
 
 public class ModBlockStateProvider extends BlockStateProvider
@@ -34,7 +34,7 @@ public class ModBlockStateProvider extends BlockStateProvider
         blockWithItem(APBlocks.ME_AMADRON_EXTENDED_PROCESS_STATION);
     }
 
-    private void blockWithItem(DeferredBlock<?> deferredBlock)
+    private void blockWithItem(RegistryObject<? extends Block> deferredBlock)
     {
         simpleBlockWithItem(deferredBlock.get(), cubeAll(deferredBlock.get()));
     }
@@ -48,7 +48,8 @@ public class ModBlockStateProvider extends BlockStateProvider
      * 贴图路径：textures/block/<id>/<state>.png
      */
     public <E extends Enum<E> & StringRepresentable>
-    void cubeAllPerState(DeferredBlock<? extends Block> defBlock, EnumProperty<E> prop) {
+    void cubeAllPerState(RegistryObject<? extends Block> defBlock, EnumProperty<E> prop)
+    {
         Block block = defBlock.get();
 
         var def = block.getStateDefinition();
