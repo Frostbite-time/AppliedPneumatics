@@ -17,6 +17,7 @@ import me.desht.pneumaticcraft.common.upgrades.ModUpgrades;
 import me.desht.pneumaticcraft.datagen.recipe.AmadronRecipeBuilder;
 import me.desht.pneumaticcraft.datagen.recipe.AssemblyRecipeBuilder;
 import me.desht.pneumaticcraft.datagen.recipe.PressureChamberRecipeBuilder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
@@ -289,15 +290,15 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
     // 配方路径统一
     private static ResourceLocation housingShapedId(ItemLike housing)
     {
-        return AppliedPneumatics.makeId("cells/housing/" + housing.toString());
+        return AppliedPneumatics.makeId("cells/housing/" + BuiltInRegistries.ITEM.getKey(housing.asItem()).getPath());
     }
     private static ResourceLocation cellShapedId(ItemLike cell)
     {
-        return AppliedPneumatics.makeId("cells/shaped/" + cell.toString());
+        return AppliedPneumatics.makeId("cells/shaped/" + BuiltInRegistries.ITEM.getKey(cell.asItem()).getPath());
     }
     private static ResourceLocation cellShapelessId(ItemLike cell)
     {
-        return AppliedPneumatics.makeId("cells/shapeless/" + cell.toString());
+        return AppliedPneumatics.makeId("cells/shapeless/" + BuiltInRegistries.ITEM.getKey(cell.asItem()).getPath());
     }
 
     // 添加所有元件

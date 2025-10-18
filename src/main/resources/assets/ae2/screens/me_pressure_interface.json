@@ -2,8 +2,7 @@
   "$schema": "schema.json",
   "includes": [
     "common/common.json",
-    "common/player_inventory.json",
-    "common/toolbox.json"
+    "common/player_inventory.json"
   ],
   "background": {
     "texture": "appliedpneumatics:textures/gui/me_pressure_interface_menu.png",

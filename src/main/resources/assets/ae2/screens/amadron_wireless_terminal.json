@@ -1,8 +1,7 @@
 {
   "$schema": "schema.json",
   "includes": [
-    "common/common.json",
-    "amadron_terminal_toolbox.json"
+    "common/common.json"
   ],
   "background": {
     "texture": "appliedpneumatics:textures/gui/amadron_wireless_terminal.png",
