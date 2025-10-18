@@ -1,6 +1,7 @@
 package com.wintercogs.appliedpneumatics.common.items;
 
 import appeng.api.config.FuzzyMode;
+import appeng.api.implementations.items.IAEItemPowerStorage;
 import appeng.api.stacks.GenericStack;
 import appeng.api.storage.cells.CellState;
 import appeng.api.upgrades.IUpgradeInventory;
@@ -11,15 +12,18 @@ import appeng.core.AppEng;
 import appeng.core.localization.Tooltips;
 import appeng.items.storage.StorageCellTooltipComponent;
 import appeng.items.tools.powered.AbstractPortableCell;
-import appeng.items.tools.powered.PoweredContainerItem;
-import appeng.items.tools.powered.powersink.PoweredItemCapabilities;
+import appeng.items.tools.powered.powersink.AEBasePoweredItem;
 import appeng.util.Platform;
 import com.wintercogs.appliedpneumatics.common.air.PortableAirCellItemStackHandler;
 import com.wintercogs.appliedpneumatics.common.init.APItems;
 import com.wintercogs.appliedpneumatics.common.me.keys.AirKey;
+import com.wintercogs.appliedpneumatics.util.CombinedCapProvider;
 import me.desht.pneumaticcraft.api.PNCCapabilities;
 import me.desht.pneumaticcraft.api.tileentity.IAirHandler;
+import me.desht.pneumaticcraft.api.tileentity.IAirHandlerItem;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -29,10 +33,12 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -51,104 +57,21 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
         this.totalBytes = kilobytes * 1024;
     }
 
-    public static void onRegisterCaps(RegisterCapabilitiesEvent event)
+    @Override
+    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt)
     {
-        // 1K
-        PortableAirStorageCell powerStorage1k = APItems.PORTABLE_AIR_CELL_1K.get();
-        event.registerItem(Capabilities.EnergyStorage.ITEM,
-                (o, unused) -> new PoweredItemCapabilities(o, powerStorage1k),
-                APItems.PORTABLE_AIR_CELL_1K);
-        event.registerItem(PNCCapabilities.AIR_HANDLER_ITEM,
-                (o, unused) -> new PortableAirCellItemStackHandler(o),
-                APItems.PORTABLE_AIR_CELL_1K);
+        ICapabilityProvider parent = super.initCapabilities(stack, nbt);
+        ICapabilityProvider airProvider = new PortableAirCellItemStackHandler(stack);
 
-        // 4K
-        PortableAirStorageCell powerStorage4k = APItems.PORTABLE_AIR_CELL_4K.get();
-        event.registerItem(Capabilities.EnergyStorage.ITEM,
-                (o, unused) -> new PoweredItemCapabilities(o, powerStorage4k),
-                APItems.PORTABLE_AIR_CELL_4K);
-        event.registerItem(PNCCapabilities.AIR_HANDLER_ITEM,
-                (o, unused) -> new PortableAirCellItemStackHandler(o),
-                APItems.PORTABLE_AIR_CELL_4K);
-
-        // 16K
-        PortableAirStorageCell powerStorage16k = APItems.PORTABLE_AIR_CELL_16K.get();
-        event.registerItem(Capabilities.EnergyStorage.ITEM,
-                (o, unused) -> new PoweredItemCapabilities(o, powerStorage16k),
-                APItems.PORTABLE_AIR_CELL_16K);
-        event.registerItem(PNCCapabilities.AIR_HANDLER_ITEM,
-                (o, unused) -> new PortableAirCellItemStackHandler(o),
-                APItems.PORTABLE_AIR_CELL_16K);
-
-        // 64K
-        PortableAirStorageCell powerStorage64k = APItems.PORTABLE_AIR_CELL_64K.get();
-        event.registerItem(Capabilities.EnergyStorage.ITEM,
-                (o, unused) -> new PoweredItemCapabilities(o, powerStorage64k),
-                APItems.PORTABLE_AIR_CELL_64K);
-        event.registerItem(PNCCapabilities.AIR_HANDLER_ITEM,
-                (o, unused) -> new PortableAirCellItemStackHandler(o),
-                APItems.PORTABLE_AIR_CELL_64K);
-
-        // 256K
-        PortableAirStorageCell powerStorage256k = APItems.PORTABLE_AIR_CELL_256K.get();
-        event.registerItem(Capabilities.EnergyStorage.ITEM,
-                (o, unused) -> new PoweredItemCapabilities(o, powerStorage256k),
-                APItems.PORTABLE_AIR_CELL_256K);
-        event.registerItem(PNCCapabilities.AIR_HANDLER_ITEM,
-                (o, unused) -> new PortableAirCellItemStackHandler(o),
-                APItems.PORTABLE_AIR_CELL_256K);
-
-        // 1M
-        PortableAirStorageCell powerStorage1m = APItems.PORTABLE_AIR_CELL_1M.get();
-        event.registerItem(Capabilities.EnergyStorage.ITEM,
-                (o, unused) -> new PoweredItemCapabilities(o, powerStorage1m),
-                APItems.PORTABLE_AIR_CELL_1M);
-        event.registerItem(PNCCapabilities.AIR_HANDLER_ITEM,
-                (o, unused) -> new PortableAirCellItemStackHandler(o),
-                APItems.PORTABLE_AIR_CELL_1M);
-
-        // 4M
-        PortableAirStorageCell powerStorage4m = APItems.PORTABLE_AIR_CELL_4M.get();
-        event.registerItem(Capabilities.EnergyStorage.ITEM,
-                (o, unused) -> new PoweredItemCapabilities(o, powerStorage4m),
-                APItems.PORTABLE_AIR_CELL_4M);
-        event.registerItem(PNCCapabilities.AIR_HANDLER_ITEM,
-                (o, unused) -> new PortableAirCellItemStackHandler(o),
-                APItems.PORTABLE_AIR_CELL_4M);
-
-        // 16M
-        PortableAirStorageCell powerStorage16m = APItems.PORTABLE_AIR_CELL_16M.get();
-        event.registerItem(Capabilities.EnergyStorage.ITEM,
-                (o, unused) -> new PoweredItemCapabilities(o, powerStorage16m),
-                APItems.PORTABLE_AIR_CELL_16M);
-        event.registerItem(PNCCapabilities.AIR_HANDLER_ITEM,
-                (o, unused) -> new PortableAirCellItemStackHandler(o),
-                APItems.PORTABLE_AIR_CELL_16M);
-
-        // 64M
-        PortableAirStorageCell powerStorage64m = APItems.PORTABLE_AIR_CELL_64M.get();
-        event.registerItem(Capabilities.EnergyStorage.ITEM,
-                (o, unused) -> new PoweredItemCapabilities(o, powerStorage64m),
-                APItems.PORTABLE_AIR_CELL_64M);
-        event.registerItem(PNCCapabilities.AIR_HANDLER_ITEM,
-                (o, unused) -> new PortableAirCellItemStackHandler(o),
-                APItems.PORTABLE_AIR_CELL_64M);
-
-        // 256M
-        PortableAirStorageCell powerStorage256m = APItems.PORTABLE_AIR_CELL_256M.get();
-        event.registerItem(Capabilities.EnergyStorage.ITEM,
-                (o, unused) -> new PoweredItemCapabilities(o, powerStorage256m),
-                APItems.PORTABLE_AIR_CELL_256M);
-        event.registerItem(PNCCapabilities.AIR_HANDLER_ITEM,
-                (o, unused) -> new PortableAirCellItemStackHandler(o),
-                APItems.PORTABLE_AIR_CELL_256M);
+        // 返回组合 provider：内部把两者串起来
+        return new CombinedCapProvider(parent, airProvider);
     }
 
     public static int getColor(ItemStack stack, int tintIndex)
     {
         if (tintIndex == 1)
         {
-            if(stack.getItem() instanceof PoweredContainerItem poweredContainer)
+            if(stack.getItem() instanceof AEBasePoweredItem poweredContainer)
             {
                 if(poweredContainer.getAECurrentPower(stack) <= 0)
                     return CellState.ABSENT.getStateColor();;
@@ -177,9 +100,7 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> lines,
-                                TooltipFlag advancedTooltips)
+    public void appendHoverText(ItemStack stack, Level level, List<Component> lines, TooltipFlag advancedTooltips)
     {
         if (Platform.isClient())
         {
@@ -190,9 +111,9 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
             // 单类型：0 或 1
             int typesUsed = stored > 0 ? 1 : 0;
             lines.add(Tooltips.typesUsed(typesUsed, 1));
-            IAirHandler handler = stack.getCapability(PNCCapabilities.AIR_HANDLER_ITEM);
-            if(handler != null)
-                lines.add(Component.translatable("appliedpneumatics.portable_air_cell.bar", String.format(Locale.ROOT, "%.1f", handler.getPressure())).withStyle(ChatFormatting.DARK_GREEN));
+            stack.getCapability(PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY).resolve()
+                    .ifPresent(handler -> lines.add(Component.translatable("appliedpneumatics.portable_air_cell.bar",
+                            String.format(Locale.ROOT, "%.1f", handler.getPressure())).withStyle(ChatFormatting.DARK_GREEN)));
         }
     }
 
@@ -256,11 +177,11 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
         if (level.isClientSide) return;
         if (level.getGameTime() % 20 != 0) return;
         if (!(entity instanceof Player player)) return;
-        if (!getUpgrades(stack).isInstalled(APItems.CHARGING_CARD)) return;
+        if (!getUpgrades(stack).isInstalled(APItems.CHARGING_CARD.get())) return;
         if (this.getAECurrentPower(stack) <= 0) return;
 
         // 本便携空气单元的空气接口
-        final IAirHandler src = stack.getCapability(PNCCapabilities.AIR_HANDLER_ITEM);
+        final IAirHandler src = stack.getCapability(PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY).resolve().orElse(null);
         if (src == null) return;
 
         final float DEAD_BAND_BAR = 0.05f;     // 压差死区，防抖
@@ -290,7 +211,7 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
             if (other == stack) continue; // 自身
             if (other.getItem() instanceof IAirStorageCell) continue; // 不给其它空气“存储单元/元件”充气
 
-            IAirHandler dst = other.getCapability(PNCCapabilities.AIR_HANDLER_ITEM);
+            IAirHandler dst = other.getCapability(PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY).resolve().orElse(null);
             if (dst == null) continue;
 
             // 单向：只有当本单元气压高于目标物品气压，且超出死区时，才推进空气

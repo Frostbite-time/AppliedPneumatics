@@ -1,6 +1,5 @@
 package com.wintercogs.appliedpneumatics.common.blocks.entitis;
 
-import appeng.api.AECapabilities;
 import appeng.api.config.Actionable;
 import appeng.api.config.PowerMultiplier;
 import appeng.api.networking.GridFlags;
@@ -13,7 +12,7 @@ import appeng.api.upgrades.IUpgradeInventory;
 import appeng.api.upgrades.IUpgradeableObject;
 import appeng.api.upgrades.UpgradeInventories;
 import appeng.blockentity.ServerTickingBlockEntity;
-import appeng.blockentity.grid.AENetworkedBlockEntity;
+import appeng.blockentity.grid.AENetworkBlockEntity;
 import appeng.core.definitions.AEItems;
 import com.wintercogs.appliedpneumatics.common.init.APBlockEntities;
 import com.wintercogs.appliedpneumatics.common.init.APBlockStates;
@@ -25,25 +24,26 @@ import me.desht.pneumaticcraft.api.heat.IHeatExchangerLogic;
 import me.desht.pneumaticcraft.common.heat.HeatExchangerManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 import java.util.List;
 
 /** 注意，这里所有的温度单位都是开尔文，而不是摄氏度 */
-public class METemperatureInterfaceBlockEntity extends AENetworkedBlockEntity implements IUpgradeableObject,
+public class METemperatureInterfaceBlockEntity extends AENetworkBlockEntity implements IUpgradeableObject,
         ServerTickingBlockEntity
 {
     private static final int SOFT_FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
 
-    private final IUpgradeInventory upgrades = UpgradeInventories.forMachine(APBlocks.ME_TEMPERATURE_INTERFACE, 5, this::onUpgradesChanged);
+    private final IUpgradeInventory upgrades = UpgradeInventories.forMachine(APBlocks.ME_TEMPERATURE_INTERFACE.get(), 5, this::onUpgradesChanged);
 
     // 温度接口----------------------------------------------------------------------------------
     private static final int BASE_HEAT_CAP = 1000; // 无任何升级下的基础热容
@@ -57,6 +57,9 @@ public class METemperatureInterfaceBlockEntity extends AENetworkedBlockEntity im
     private int maxTemperatureChangePerTick = 1; // 每tick与ME系统交互时，最大温度改变量
     private double lastTemperature = 0;
 
+    // 能力缓存
+    LazyOptional<IHeatExchangerLogic> heatOpt = LazyOptional.empty();
+
 
     public METemperatureInterfaceBlockEntity(BlockPos pos, BlockState blockState)
     {
@@ -67,19 +70,25 @@ public class METemperatureInterfaceBlockEntity extends AENetworkedBlockEntity im
                 .setExposedOnSides(EnumSet.allOf(Direction.class)); // 可以用于连接的方向
     }
 
-    // 注册AE节点和空气容器能力
-    public static void onRegisterCaps(RegisterCapabilitiesEvent event)
+    @Override
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side)
     {
-        event.registerBlockEntity(
-                AECapabilities.IN_WORLD_GRID_NODE_HOST,
-                APBlockEntities.ME_TEMPERATURE_INTERFACE_BLOCK_ENTITY.get(),
-                (be, unused) -> be
-        );
-        event.registerBlockEntity(
-                PNCCapabilities.HEAT_EXCHANGER_BLOCK,
-                APBlockEntities.ME_TEMPERATURE_INTERFACE_BLOCK_ENTITY.get(),
-                (be, direction) -> be.heatHandler
-        );
+        if(cap == PNCCapabilities.HEAT_EXCHANGER_CAPABILITY)
+        {
+            if(!heatOpt.isPresent())
+                heatOpt = LazyOptional.of(() -> heatHandler);
+            return heatOpt.cast();
+        }
+        return super.getCapability(cap, side);
+    }
+
+    @Override
+    public void invalidateCaps()
+    {
+        super.invalidateCaps();
+
+        if(heatOpt.isPresent()) heatOpt.invalidate();
+        heatOpt = LazyOptional.empty();
     }
 
     public IHeatExchangerLogic getHeatHandler()
@@ -197,10 +206,10 @@ public class METemperatureInterfaceBlockEntity extends AENetworkedBlockEntity im
     }
 
     @Override
-    public void loadTag(CompoundTag tag, HolderLookup.Provider registries)
+    public void loadTag(CompoundTag tag)
     {
-        super.loadTag(tag, registries);
-        this.upgrades.readFromNBT(tag, "upgrades", registries);
+        super.loadTag(tag);
+        this.upgrades.readFromNBT(tag, "upgrades");
         this.heatHandler.deserializeNBT(tag.getCompound("heat_handler"));
         this.expectedTemperature = tag.getDouble("expected_temperature");
     }
@@ -215,10 +224,10 @@ public class METemperatureInterfaceBlockEntity extends AENetworkedBlockEntity im
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    public void saveAdditional(CompoundTag tag)
     {
-        super.saveAdditional(tag, registries);
-        this.upgrades.writeToNBT(tag, "upgrades", registries);
+        super.saveAdditional(tag);
+        this.upgrades.writeToNBT(tag, "upgrades");
         tag.put("heat_handler", this.heatHandler.serializeNBT());
         tag.putDouble("expected_temperature", this.expectedTemperature);
     }
@@ -229,7 +238,7 @@ public class METemperatureInterfaceBlockEntity extends AENetworkedBlockEntity im
         int speedCards = this.upgrades.getInstalledUpgrades(AEItems.SPEED_CARD);
         this.maxTemperatureChangePerTick = (speedCards <= 0) ? 1 : (1 << speedCards);
         // 热容为基础热容值*2的n次方，n为容积卡数量
-        int volume_cards = this.upgrades.getInstalledUpgrades(APItems.VOLUME_CARD);
+        int volume_cards = this.upgrades.getInstalledUpgrades(APItems.VOLUME_CARD.get());
         int mul = (volume_cards <= 0) ? 1 : (1 << volume_cards);
         this.heatHandler.setThermalCapacity(BASE_HEAT_CAP * (double) mul);
         interactWithME(); // 应用升级后立刻与ME系统进行一次交互

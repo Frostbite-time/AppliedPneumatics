@@ -5,33 +5,38 @@ import appeng.api.stacks.GenericStack;
 import appeng.api.storage.StorageCells;
 import appeng.api.storage.cells.CellState;
 import appeng.api.storage.cells.ICellWorkbenchItem;
+import appeng.api.storage.cells.StorageCell;
 import appeng.api.upgrades.IUpgradeInventory;
 import appeng.api.upgrades.UpgradeInventories;
 import appeng.core.AEConfig;
+import appeng.core.AELog;
 import appeng.core.localization.PlayerMessages;
 import appeng.core.localization.Tooltips;
 import appeng.items.storage.StorageCellTooltipComponent;
-import appeng.recipes.game.StorageCellDisassemblyRecipe;
-import appeng.util.InteractionUtil;
 import appeng.util.Platform;
+import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.common.me.keys.AirKey;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStorageCell
 {
@@ -55,12 +60,10 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack,
-                                @NotNull TooltipContext context,
-                                @NotNull List<Component> lines,
-                                @NotNull TooltipFlag advancedTooltips)
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> lines, @NotNull TooltipFlag isAdvanced)
     {
-        if (Platform.isClient()) {
+        if (Platform.isClient())
+        {
             // 基础容量/使用
             long stored = IAirStorageCell.getStoredAir(stack);
             long used   = IAirStorageCell.usedBytes(stored);
@@ -123,44 +126,63 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
     @Override
     public void setFuzzyMode(ItemStack is, FuzzyMode fzMode) {}
 
+    // 用于锁定拆解配方的特定路径
+    public ResourceLocation getRecipeId()
+    {
+        return AppliedPneumatics.makeId("cells/shapeless/" +
+                Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(this)).getPath());
+    }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand)
+    {
         this.disassembleDrive(player.getItemInHand(hand), level, player);
         return new InteractionResultHolder<>(InteractionResult.sidedSuccess(level.isClientSide()),
                 player.getItemInHand(hand));
     }
 
-    private boolean disassembleDrive(ItemStack stack, Level level, Player player) {
-        if (!InteractionUtil.isInAlternateUseMode(player)) {
+    private boolean disassembleDrive(ItemStack stack, Level level, Player player)
+    {
+        Recipe<?> recipe = level.getRecipeManager().byKey(this.getRecipeId()).orElse(null);
+        if (recipe instanceof CraftingRecipe)
+        {
+            CraftingRecipe craftingRecipe = (CraftingRecipe)recipe;
+            if (level.isClientSide()) return true;
+
+            Inventory playerInventory = player.getInventory();
+            if (playerInventory.getSelected() != stack) return false;
+
+            StorageCell inv = StorageCells.getCellInventory(stack, null);
+            if (inv == null) return false;
+
+            if (inv.getAvailableStacks().isEmpty())
+            {
+                playerInventory.setItem(playerInventory.selected, ItemStack.EMPTY);
+
+                for(Ingredient ingredient : craftingRecipe.getIngredients())
+                {
+                    ItemStack ingredientStack = ingredient.getItems()[0].copy();
+                    playerInventory.placeItemBackInInventory(ingredientStack);
+                }
+
+                for(ItemStack upgrade : this.getUpgrades(stack))
+                {
+                    playerInventory.placeItemBackInInventory(upgrade);
+                }
+            }
+            else
+            {
+                player.displayClientMessage(PlayerMessages.OnlyEmptyCellsCanBeDisassembled.text(), true);
+            }
+
+            return true;
+
+        }
+        else
+        {
+            AELog.debug("Cannot disassemble portable cell because it's crafting recipe doesn't exist: %s", new Object[]{this.getRecipeId()});
             return false;
         }
-
-        var disassembledStacks = StorageCellDisassemblyRecipe.getDisassemblyResult(level, stack.getItem());
-        if (disassembledStacks.isEmpty()) {
-            return false;
-        }
-
-        var playerInventory = player.getInventory();
-        if (playerInventory.getSelected() != stack) {
-            return false;
-        }
-
-        var inv = StorageCells.getCellInventory(stack, null);
-        if (inv != null && !inv.getAvailableStacks().isEmpty()) {
-            player.displayClientMessage(PlayerMessages.OnlyEmptyCellsCanBeDisassembled.text(), true);
-            return false;
-        }
-
-        playerInventory.setItem(playerInventory.selected, ItemStack.EMPTY);
-
-        for (var disassembledStack : disassembledStacks) {
-            playerInventory.placeItemBackInInventory(disassembledStack.copy());
-        }
-
-        getUpgrades(stack).forEach(playerInventory::placeItemBackInInventory);
-
-        return true;
     }
 
     @Override

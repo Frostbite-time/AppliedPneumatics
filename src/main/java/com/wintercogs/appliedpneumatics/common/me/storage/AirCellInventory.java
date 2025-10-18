@@ -28,7 +28,6 @@ import java.lang.reflect.Field;
 
 public class AirCellInventory implements StorageCell
 {
-    private static final String AIR_STORED_TAG = "air_stored";
 
     private long storedAir; // 内部缓存，操作时立即写回到 itemStack，persist 基本是空操作
 
@@ -85,7 +84,7 @@ public class AirCellInventory implements StorageCell
         if (!isPersisted)
         {
             CompoundTag tag = itemStack.getOrCreateTag();
-            tag.putLong(AIR_STORED_TAG, storedAir);
+            tag.putLong(IAirStorageCell.AIR_STORED_TAG, storedAir);
             isPersisted = true;
         }
     }
@@ -239,9 +238,9 @@ public class AirCellInventory implements StorageCell
     public long getAirFromStack()
     {
         CompoundTag tag = itemStack.getOrCreateTag();
-        if(tag.contains(AIR_STORED_TAG))
+        if(tag.contains(IAirStorageCell.AIR_STORED_TAG))
         {
-            return tag.getLong(AIR_STORED_TAG);
+            return tag.getLong(IAirStorageCell.AIR_STORED_TAG);
         }
         writeAirToStack(0);
         return 0;
@@ -251,7 +250,7 @@ public class AirCellInventory implements StorageCell
     {
         long air = Math.max(0, value);
         CompoundTag tag = itemStack.getOrCreateTag();
-        tag.putLong(AIR_STORED_TAG, air);
+        tag.putLong(IAirStorageCell.AIR_STORED_TAG, air);
     }
 
     public static @Nullable BlockEntity tryGetHostBE(ISaveProvider host) {

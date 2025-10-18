@@ -2,11 +2,13 @@ package com.wintercogs.appliedpneumatics.common.init;
 
 import appeng.api.config.Actionable;
 import appeng.api.upgrades.IUpgradeableItem;
+import appeng.items.tools.powered.powersink.AEBasePoweredItem;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.Config;
 import com.wintercogs.appliedpneumatics.common.items.IAirStorageCell;
 import com.wintercogs.appliedpneumatics.common.me.keys.types.AirKeyType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -67,12 +69,12 @@ public class APCreativeModeTabs
                                     output.accept(cellStack.copy());
                             }
                             // 满电的
-                            if(cellStack.getItem() instanceof PoweredContainerItem poweredContainerItem)
+                            if(cellStack.getItem() instanceof AEBasePoweredItem poweredContainerItem)
                             {
                                 ItemStack copy = cellStack.copy();
                                 poweredContainerItem.injectAEPower(copy, Double.MAX_VALUE, Actionable.MODULATE);
                                 if(copy.getItem() instanceof IUpgradeableItem upgradeableItem)
-                                    upgradeableItem.getUpgrades(copy).addItems(APItems.SECURITY_CARD.toStack());
+                                    upgradeableItem.getUpgrades(copy).addItems(new ItemStack(APItems.SECURITY_CARD.get()));
 
                                 if(copy.getItem() instanceof IAirStorageCell cell)
                                 {
@@ -86,11 +88,12 @@ public class APCreativeModeTabs
                             if(cellStack.getItem() instanceof IAirStorageCell cell)
                             {
                                 ItemStack copy = cellStack.copy();
-                                copy.set(APDataComponents.AIR_STORED, (long) cell.getTotalBytes() * AirKeyType.INSTANCE.getAmountPerByte());
-                                if(copy.getItem() instanceof PoweredContainerItem poweredContainerItem)
+                                CompoundTag tag = copy.getOrCreateTag();
+                                tag.putLong(IAirStorageCell.AIR_STORED_TAG, (long) cell.getTotalBytes() * AirKeyType.INSTANCE.getAmountPerByte());
+                                if(copy.getItem() instanceof AEBasePoweredItem poweredContainerItem)
                                     poweredContainerItem.injectAEPower(copy, Double.MAX_VALUE, Actionable.MODULATE);
                                 if(copy.getItem() instanceof IUpgradeableItem upgradeableItem)
-                                    upgradeableItem.getUpgrades(copy).addItems(APItems.SECURITY_CARD.toStack());
+                                    upgradeableItem.getUpgrades(copy).addItems(new ItemStack(APItems.SECURITY_CARD.get()));
 
                                 if(cell.getTotalBytes() <= 270000)
                                     output.accept(copy);
@@ -110,7 +113,7 @@ public class APCreativeModeTabs
                         // 亚马龙终端以及其满电状态
                         output.accept(APItems.AMADRON_WIRELESS_TERMINAL.get());
                         ItemStack amadronWirelessTerminalFull = new ItemStack(APItems.AMADRON_WIRELESS_TERMINAL.get());
-                        ((PoweredContainerItem)amadronWirelessTerminalFull.getItem()).injectAEPower(amadronWirelessTerminalFull, Double.MAX_VALUE, Actionable.MODULATE);
+                        ((AEBasePoweredItem)amadronWirelessTerminalFull.getItem()).injectAEPower(amadronWirelessTerminalFull, Double.MAX_VALUE, Actionable.MODULATE);
                         output.accept(amadronWirelessTerminalFull);
 
                         output.accept(APBlocks.ME_AMADRON_PROCESS_STATION.get());

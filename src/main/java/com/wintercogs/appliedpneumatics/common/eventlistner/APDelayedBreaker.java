@@ -5,6 +5,7 @@ import com.wintercogs.appliedpneumatics.common.init.APItems;
 import com.wintercogs.appliedpneumatics.common.items.IAirStorageCell;
 import me.desht.pneumaticcraft.common.particle.AirParticleData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -13,6 +14,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -68,7 +71,8 @@ public class APDelayedBreaker
         }
         boolean didAnything = false;
         // 走能力系统尝试找元件
-        IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
+        BlockEntity blockEntity = server.getBlockEntity(pos);
+        IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve().orElse(null);
         if(itemHandler != null)
         {
             for(int i = 0; i < itemHandler.getSlots(); i++)
@@ -78,8 +82,10 @@ public class APDelayedBreaker
                 if(stack.getItem() instanceof IAirStorageCell cell)
                 {
                     // 剩余容量小于等于0，且没有安装安全卡或者真空卡
-                    if(IAirStorageCell.remainingAmount(cell.getTotalBytes(), stack.getOrDefault(APDataComponents.AIR_STORED, 0L)) <= 0
-                    && !cell.getUpgrades(stack).isInstalled(APItems.SECURITY_CARD) && !cell.getUpgrades(stack).isInstalled(APItems.VACUUM_CARD))
+                    CompoundTag tag = stack.getOrCreateTag(); // 已经插入的必然有tag，所以我们不做判断，直接getOrCreateTag没有问题
+                    long airStored = tag.getLong(IAirStorageCell.AIR_STORED_TAG);
+                    if(IAirStorageCell.remainingAmount(cell.getTotalBytes(), airStored) <= 0
+                    && !cell.getUpgrades(stack).isInstalled(APItems.SECURITY_CARD.get()) && !cell.getUpgrades(stack).isInstalled(APItems.VACUUM_CARD.get()))
                     {
                         ItemStack extracted = itemHandler.extractItem(i, 1, false);
                         if(!extracted.isEmpty())

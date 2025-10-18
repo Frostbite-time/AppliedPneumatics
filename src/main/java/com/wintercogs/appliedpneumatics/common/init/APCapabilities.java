@@ -17,10 +17,7 @@ public class APCapabilities
     @SubscribeEvent
     public static void onRegisterCaps(RegisterCapabilitiesEvent event)
     {
-        MEPressureInterfaceBlockEntity.onRegisterCaps(event);
         AmadronWirelessTerminalItem.onRegisterCaps(event);
         MEAmadronProcessStationBlockEntity.onRegisterCaps(event);
-        METemperatureInterfaceBlockEntity.onRegisterCaps(event);
-        PortableAirStorageCell.onRegisterCaps(event);
     }
 }
