@@ -85,5 +85,8 @@
   "tooltip.appliedpneumatics.amadron_trade.supplier": "供給元：",
   "tooltip.appliedpneumatics.amadron_trade.output": "販売品：",
   "tooltip.appliedpneumatics.amadron_trade.input": "価格：",
-  "tooltip.appliedpneumatics.amadron_trade.in_basket": "カート内："
+  "tooltip.appliedpneumatics.amadron_trade.in_basket": "カート内：",
+
+  "pack.appliedpneumatics.optional_textures.title": "Applied Pneumatics：オプショナルリソースパック",
+  "pack.appliedpneumatics.optional_textures": "クラシックスタイルとモダンスタイルを切り替えます。リソースパックメニューでModリソースの上に配置して有効にしてください。"
 }

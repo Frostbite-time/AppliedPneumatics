@@ -85,5 +85,8 @@
   "tooltip.appliedpneumatics.amadron_trade.supplier": "공급자:",
   "tooltip.appliedpneumatics.amadron_trade.output": "판매:",
   "tooltip.appliedpneumatics.amadron_trade.input": "가격:",
-  "tooltip.appliedpneumatics.amadron_trade.in_basket": "장바구니:"
+  "tooltip.appliedpneumatics.amadron_trade.in_basket": "장바구니:",
+
+  "pack.appliedpneumatics.optional_textures.title": "Applied Pneumatics: 선택적 리소스 팩",
+  "pack.appliedpneumatics.optional_textures": "클래식 스타일과 모던 스타일을 전환하세요. 리소스 팩 메뉴에서 모드 리소스 위에 배치하여 활성화합니다."
 }

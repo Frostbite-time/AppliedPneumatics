@@ -85,5 +85,8 @@
   "tooltip.appliedpneumatics.amadron_trade.supplier": "Поставщик:",
   "tooltip.appliedpneumatics.amadron_trade.output": "Продаёт:",
   "tooltip.appliedpneumatics.amadron_trade.input": "Цена:",
-  "tooltip.appliedpneumatics.amadron_trade.in_basket": "В корзине:"
+  "tooltip.appliedpneumatics.amadron_trade.in_basket": "В корзине:",
+
+  "pack.appliedpneumatics.optional_textures.title": "Applied Pneumatics: Опциональный набор ресурсов",
+  "pack.appliedpneumatics.optional_textures": "Переключайтесь между классическим и современным стилями. Включите, поместив его над набором ресурсов мода в меню ресурсных пакетов."
 }

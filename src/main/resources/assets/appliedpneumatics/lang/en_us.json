@@ -85,5 +85,8 @@
   "tooltip.appliedpneumatics.amadron_trade.supplier": "Supplier:",
   "tooltip.appliedpneumatics.amadron_trade.output": "Sells:",
   "tooltip.appliedpneumatics.amadron_trade.input": "Price:",
-  "tooltip.appliedpneumatics.amadron_trade.in_basket": "In basket:"
+  "tooltip.appliedpneumatics.amadron_trade.in_basket": "In basket:",
+
+  "pack.appliedpneumatics.optional_textures.title": "Applied Pneumatics: Optional Resource Pack",
+  "pack.appliedpneumatics.optional_textures": "Switch between classic and modern styles. Enable by placing it above the Mod Resource Pack in the resource packs menu."
 }

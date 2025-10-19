@@ -33,11 +33,11 @@ public class ModItemModelProvider extends ItemModelProvider
         cellWithOwnBaseAndAeLed(APItems.AIR_CELL_16M.get());
         cellWithOwnBaseAndAeLed(APItems.AIR_CELL_64M.get());
         cellWithOwnBaseAndAeLed(APItems.AIR_CELL_256M.get());
-        portableCell(APItems.PORTABLE_AIR_CELL_1K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_1k");
-        portableCell(APItems.PORTABLE_AIR_CELL_4K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_4k");
-        portableCell(APItems.PORTABLE_AIR_CELL_16K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_16k");
-        portableCell(APItems.PORTABLE_AIR_CELL_64K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_64k");
-        portableCell(APItems.PORTABLE_AIR_CELL_256K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_256k");
+        portableCell(APItems.PORTABLE_AIR_CELL_1K.get(), "appliedpneumatics:item/portable_cell_air_housing", "appliedpneumatics:item/portable_cell_side_1k");
+        portableCell(APItems.PORTABLE_AIR_CELL_4K.get(), "appliedpneumatics:item/portable_cell_air_housing", "appliedpneumatics:item/portable_cell_side_4k");
+        portableCell(APItems.PORTABLE_AIR_CELL_16K.get(), "appliedpneumatics:item/portable_cell_air_housing", "appliedpneumatics:item/portable_cell_side_16k");
+        portableCell(APItems.PORTABLE_AIR_CELL_64K.get(), "appliedpneumatics:item/portable_cell_air_housing", "appliedpneumatics:item/portable_cell_side_64k");
+        portableCell(APItems.PORTABLE_AIR_CELL_256K.get(), "appliedpneumatics:item/portable_cell_air_housing", "appliedpneumatics:item/portable_cell_side_256k");
         portableCell(APItems.PORTABLE_AIR_CELL_1M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_1m");
         portableCell(APItems.PORTABLE_AIR_CELL_4M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_4m");
         portableCell(APItems.PORTABLE_AIR_CELL_16M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_16m");

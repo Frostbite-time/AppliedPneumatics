@@ -85,5 +85,8 @@
   "tooltip.appliedpneumatics.amadron_trade.supplier": "Fornecedor:",
   "tooltip.appliedpneumatics.amadron_trade.output": "Vende:",
   "tooltip.appliedpneumatics.amadron_trade.input": "Preço:",
-  "tooltip.appliedpneumatics.amadron_trade.in_basket": "No carrinho:"
+  "tooltip.appliedpneumatics.amadron_trade.in_basket": "No carrinho:",
+
+  "pack.appliedpneumatics.optional_textures.title": "Applied Pneumatics: Pacote de Recursos Opcional",
+  "pack.appliedpneumatics.optional_textures": "Mude entre estilos clássico e moderno. Ative-o colocando-o acima do Pacote de Recursos do Mod no menu de pacotes de recursos."
 }

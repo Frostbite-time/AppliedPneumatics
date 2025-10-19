@@ -35,8 +35,3 @@ navigation:
 - 1 Diamond -> 1 Engineering Processor
 - 1 Gold Ingot -> 1 Logic Processor
 - 1 Silicon -> 1 Printed Silicon
-
-## Assembly Chamber - EAE Integration
-- 1 Almost Unentropized Fluix Monocrystal -> 1 Half Entropized Fluix Monocrystal
-- 1 Half Entropized Fluix Monocrystal -> 1 Mostly Entropized Fluix Monocrystal
-- 1 Mostly Entropized Fluix Monocrystal -> 1 Fully Entropized Fluix Monocrystal

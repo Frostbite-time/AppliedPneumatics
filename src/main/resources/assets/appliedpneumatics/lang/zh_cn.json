@@ -85,5 +85,8 @@
   "tooltip.appliedpneumatics.amadron_trade.supplier": "供货商：",
   "tooltip.appliedpneumatics.amadron_trade.output": "出售：",
   "tooltip.appliedpneumatics.amadron_trade.input": "价格：",
-  "tooltip.appliedpneumatics.amadron_trade.in_basket": "购物车里："
+  "tooltip.appliedpneumatics.amadron_trade.in_basket": "购物车里：",
+
+  "pack.appliedpneumatics.optional_textures.title": "应用气动：可选资源包",
+  "pack.appliedpneumatics.optional_textures": "在经典和现代风之间切换，置于Mod Resource上方启用。"
 }
