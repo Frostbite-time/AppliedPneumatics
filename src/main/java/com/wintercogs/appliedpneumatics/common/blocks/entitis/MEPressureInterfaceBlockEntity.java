@@ -313,7 +313,6 @@ public class MEPressureInterfaceBlockEntity extends AENetworkBlockEntity impleme
         final float currentPressure = be.airHandler.getPressure();
         final float targetPressure = be.expectedPressure;
         final float diffP = targetPressure - currentPressure;
-        if (Math.abs(diffP) < 0.005f) return;
 
         // 需要的空气量（以 air 单位计，1 bar ~= volume air）
         final int wantedAir = (int) (diffP * be.getVolume());
