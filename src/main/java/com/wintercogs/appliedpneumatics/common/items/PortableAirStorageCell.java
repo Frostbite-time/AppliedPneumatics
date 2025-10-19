@@ -13,6 +13,7 @@ import appeng.items.storage.StorageCellTooltipComponent;
 import appeng.items.tools.powered.AbstractPortableCell;
 import appeng.items.tools.powered.powersink.AEBasePoweredItem;
 import appeng.util.Platform;
+import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.common.air.PortableAirCellItemStackHandler;
 import com.wintercogs.appliedpneumatics.common.init.APItems;
 import com.wintercogs.appliedpneumatics.common.me.keys.AirKey;
@@ -20,6 +21,7 @@ import com.wintercogs.appliedpneumatics.util.CombinedCapProvider;
 import me.desht.pneumaticcraft.api.PNCCapabilities;
 import me.desht.pneumaticcraft.api.tileentity.IAirHandler;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -61,7 +63,7 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
 
     public static int getColor(ItemStack stack, int tintIndex)
     {
-        if (tintIndex == 1)
+        if (tintIndex == 1) // LED灯
         {
             if(stack.getItem() instanceof AEBasePoweredItem poweredContainer)
             {
@@ -72,7 +74,7 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
             CellState state = IAirStorageCell.calcState(((IAirStorageCell) stack.getItem()).getTotalBytes(), stored);
             return state.getStateColor();
         }
-        else if (tintIndex == 2 && stack.getItem() instanceof AbstractPortableCell portableCell)
+        else if (tintIndex == 0 && stack.getItem() instanceof AbstractPortableCell portableCell) // screen颜色
         {
             return portableCell.getColor(stack); // 实际上是获取之前传入的默认颜色
         }
@@ -88,7 +90,8 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
     @Override
     public ResourceLocation getRecipeId()
     {
-        return AppEng.makeId("tools/" + Objects.requireNonNull(getRegistryName()).getPath());
+        return AppliedPneumatics.makeId("cells/shapeless/" +
+                Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(this)).getPath());
     }
 
     @Override

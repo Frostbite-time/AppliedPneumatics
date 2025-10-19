@@ -23,26 +23,26 @@ public class ModItemModelProvider extends ItemModelProvider
     @Override
     protected void registerModels()
     {
-        airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_1K.get());
-        airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_4K.get());
-        airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_16K.get());
-        airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_64K.get());
-        airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_256K.get());
-        airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_1M.get());
-        airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_4M.get());
-        airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_16M.get());
-        airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_64M.get());
-        airCellWithOwnBaseAndAeLed(APItems.AIR_CELL_256M.get());
-        portableAirCell(APItems.PORTABLE_AIR_CELL_1K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_1k");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_4K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_4k");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_16K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_16k");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_64K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_64k");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_256K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_256k");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_1M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_1m");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_4M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_4m");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_16M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_16m");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_64M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_64m");
-        portableAirCell(APItems.PORTABLE_AIR_CELL_256M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_256m");
+        cellWithOwnBaseAndAeLed(APItems.AIR_CELL_1K.get());
+        cellWithOwnBaseAndAeLed(APItems.AIR_CELL_4K.get());
+        cellWithOwnBaseAndAeLed(APItems.AIR_CELL_16K.get());
+        cellWithOwnBaseAndAeLed(APItems.AIR_CELL_64K.get());
+        cellWithOwnBaseAndAeLed(APItems.AIR_CELL_256K.get());
+        cellWithOwnBaseAndAeLed(APItems.AIR_CELL_1M.get());
+        cellWithOwnBaseAndAeLed(APItems.AIR_CELL_4M.get());
+        cellWithOwnBaseAndAeLed(APItems.AIR_CELL_16M.get());
+        cellWithOwnBaseAndAeLed(APItems.AIR_CELL_64M.get());
+        cellWithOwnBaseAndAeLed(APItems.AIR_CELL_256M.get());
+        portableCell(APItems.PORTABLE_AIR_CELL_1K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_1k");
+        portableCell(APItems.PORTABLE_AIR_CELL_4K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_4k");
+        portableCell(APItems.PORTABLE_AIR_CELL_16K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_16k");
+        portableCell(APItems.PORTABLE_AIR_CELL_64K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_64k");
+        portableCell(APItems.PORTABLE_AIR_CELL_256K.get(), "appliedpneumatics:item/portable_cell_air_housing", "ae2:item/portable_cell_side_256k");
+        portableCell(APItems.PORTABLE_AIR_CELL_1M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_1m");
+        portableCell(APItems.PORTABLE_AIR_CELL_4M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_4m");
+        portableCell(APItems.PORTABLE_AIR_CELL_16M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_16m");
+        portableCell(APItems.PORTABLE_AIR_CELL_64M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_64m");
+        portableCell(APItems.PORTABLE_AIR_CELL_256M.get(), "appliedpneumatics:item/portable_mega_cell_air_housing", "appliedpneumatics:item/portable_cell_side_256m");
         basicItem(APItems.VOLUME_CARD.get());
         basicItem(APItems.SECURITY_CARD.get());
         basicItem(APItems.VACUUM_CARD.get());
@@ -60,17 +60,16 @@ public class ModItemModelProvider extends ItemModelProvider
      * @param housing layer0 纹理（通常用你自己的）
      * @param side    layer3 纹理（可能来自 ae2/megacells）
      */
-    protected void portableAirCell(ItemLike item, String housing, String side) {
+    protected ItemModelBuilder portableCell(ItemLike item, String housing, String side)
+    {
         // 让 EFH 放行校验
         allowExternalTexture(housing);
-        allowExternalTexture("ae2:item/portable_cell_led");
-        allowExternalTexture("ae2:item/portable_cell_screen");
         allowExternalTexture(side);
 
-        withExistingParent(getItemName(item), mcLoc("item/generated"))
-                .texture("layer0", housing)
-                .texture("layer1", "ae2:item/portable_cell_led")
-                .texture("layer2", "ae2:item/portable_cell_screen")
+        return withExistingParent(getItemName(item), mcLoc("item/generated"))
+                .texture("layer0", "appliedpneumatics:item/led/portable_cell_screen")
+                .texture("layer1", "appliedpneumatics:item/led/portable_cell_led")
+                .texture("layer2", housing)
                 .texture("layer3", side);
     }
 
@@ -92,15 +91,14 @@ public class ModItemModelProvider extends ItemModelProvider
 
 
     // 快速注册带led灯状态的存储元件模型
-    public ItemModelBuilder airCellWithOwnBaseAndAeLed(Item item)
+    public ItemModelBuilder cellWithOwnBaseAndAeLed(Item item)
     {
         ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
         var base = modLoc("item/" + id.getPath());
 
-        allowExternalTexture("ae2:item/portable_cell_led");
         return withExistingParent(id.getPath(), mcLoc("item/generated"))
                 .texture("layer0", base)
-                .texture("layer1", "ae2:item/portable_cell_led");
+                .texture("layer1", "appliedpneumatics:item/led/storage_cell_led");
     }
 
 }
