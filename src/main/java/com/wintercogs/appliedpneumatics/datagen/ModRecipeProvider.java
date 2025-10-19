@@ -10,6 +10,7 @@ import com.wintercogs.appliedpneumatics.common.init.APBlocks;
 import com.wintercogs.appliedpneumatics.common.init.APItems;
 import gripe._90.megacells.definition.MEGAItems;
 import me.desht.pneumaticcraft.api.crafting.AmadronTradeResource;
+import me.desht.pneumaticcraft.api.crafting.ingredient.StackedIngredient;
 import me.desht.pneumaticcraft.api.crafting.recipe.AssemblyRecipe;
 import me.desht.pneumaticcraft.common.core.ModBlocks;
 import me.desht.pneumaticcraft.common.core.ModItems;
@@ -48,20 +49,20 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
     protected void buildRecipes(@NotNull Consumer<FinishedRecipe> recipeOutput)
     {
         // 外壳
-        pressureChamber(ImmutableList.of(Ingredient.of(new ItemStack(ModBlocks.PRESSURE_TUBE.get(), 2)),
-                        Ingredient.of(new ItemStack(ModBlocks.PRESSURE_CHAMBER_GLASS.get(), 3)),
-                        Ingredient.of(new ItemStack(ModItems.COMPRESSED_IRON_INGOT.get(), 2)),
-                        Ingredient.of(new ItemStack(ModItems.PRESSURE_GAUGE.get(), 1))),
+        pressureChamber(ImmutableList.of(StackedIngredient.fromStacks(new ItemStack(ModBlocks.PRESSURE_TUBE.get(), 2)),
+                        StackedIngredient.fromStacks(new ItemStack(ModBlocks.PRESSURE_CHAMBER_GLASS.get(), 3)),
+                        StackedIngredient.fromStacks(new ItemStack(ModItems.COMPRESSED_IRON_INGOT.get(), 2)),
+                        StackedIngredient.fromStacks(new ItemStack(ModItems.PRESSURE_GAUGE.get(), 1))),
                 4f,
                 new ItemStack(APItems.AIR_CELL_SHELL.get()))
                 .build(recipeOutput, housingShapedId(APItems.AIR_CELL_SHELL.get()));
 
-        pressureChamber(ImmutableList.of(Ingredient.of(new ItemStack(ModBlocks.REINFORCED_PRESSURE_TUBE.get(), 2)),
-                        Ingredient.of(new ItemStack(MEGAItems.SKY_STEEL_INGOT, 2)),
-                        Ingredient.of(new ItemStack(ModItems.COMPRESSED_IRON_GEAR.get(), 2)),
-                        Ingredient.of(new ItemStack(ModItems.PRINTED_CIRCUIT_BOARD.get(), 1)),
-                        Ingredient.of(new ItemStack(ModItems.NETWORK_DATA_STORAGE.get(), 1)),
-                        Ingredient.of(new ItemStack(APItems.AIR_CELL_SHELL.get(), 1))),
+        pressureChamber(ImmutableList.of(StackedIngredient.fromStacks(new ItemStack(ModBlocks.REINFORCED_PRESSURE_TUBE.get(), 2)),
+                        StackedIngredient.fromStacks(new ItemStack(MEGAItems.SKY_STEEL_INGOT, 2)),
+                        StackedIngredient.fromStacks(new ItemStack(ModItems.COMPRESSED_IRON_GEAR.get(), 2)),
+                        StackedIngredient.fromStacks(new ItemStack(ModItems.PRINTED_CIRCUIT_BOARD.get(), 1)),
+                        StackedIngredient.fromStacks(new ItemStack(ModItems.NETWORK_DATA_STORAGE.get(), 1)),
+                        StackedIngredient.fromStacks(new ItemStack(APItems.AIR_CELL_SHELL.get(), 1))),
                 5f,
                 new ItemStack(APItems.MEGA_AIR_CELL_SHELL.get()))
                 .addCondition(new ModLoadedCondition(AppliedPneumatics.MEGA_CELL_MODID))
@@ -221,67 +222,67 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .build(recipeOutput, AppliedPneumatics.makeId("amadron/singularity_to_emerald"));
 
         // 装配室联动配方
-        assembly(Ingredient.of(new ItemStack(AEParts.SMART_CABLE.item(AEColor.TRANSPARENT), 16)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(AEParts.SMART_CABLE.item(AEColor.TRANSPARENT), 16)),
                 new ItemStack(AEParts.SMART_DENSE_CABLE.item(AEColor.TRANSPARENT), 8),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/smart_cable_to_smart_dense_cable"));
 
-        assembly(Ingredient.of(new ItemStack(AEParts.GLASS_CABLE.item(AEColor.TRANSPARENT), 16)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(AEParts.GLASS_CABLE.item(AEColor.TRANSPARENT), 16)),
                 new ItemStack(AEParts.SMART_CABLE.item(AEColor.TRANSPARENT), 16),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/glass_cable_to_smart_cable"));
 
-        assembly(Ingredient.of(new ItemStack(AEBlocks.DAMAGED_BUDDING_QUARTZ, 1)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(AEBlocks.DAMAGED_BUDDING_QUARTZ, 1)),
                 new ItemStack(AEBlocks.CHIPPED_BUDDING_QUARTZ, 1),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/damage_budding_quartz_to_chipped_budding_quartz"));
 
-        assembly(Ingredient.of(new ItemStack(AEBlocks.CHIPPED_BUDDING_QUARTZ, 1)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(AEBlocks.CHIPPED_BUDDING_QUARTZ, 1)),
                 new ItemStack(AEBlocks.FLAWED_BUDDING_QUARTZ, 1),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/chipped_budding_quartz_to_flaw_budding_quartz"));
 
-        assembly(Ingredient.of(new ItemStack(AEBlocks.FLAWED_BUDDING_QUARTZ, 64)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(AEBlocks.FLAWED_BUDDING_QUARTZ, 64)),
                 new ItemStack(AEBlocks.FLAWLESS_BUDDING_QUARTZ, 1),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/flaw_budding_quartz_to_flawless_budding_quartz"));
 
-        assembly(Ingredient.of(new ItemStack(AEBlocks.ENERGY_CELL, 8)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(AEBlocks.ENERGY_CELL, 8)),
                 new ItemStack(AEBlocks.DENSE_ENERGY_CELL, 1),
                 AssemblyRecipe.AssemblyProgramType.DRILL)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/energy_cell_to_dense_energy_cell"));
 
-        assembly(Ingredient.of(new ItemStack(AEBlocks.NOT_SO_MYSTERIOUS_CUBE, 1)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(AEBlocks.NOT_SO_MYSTERIOUS_CUBE, 1)),
                 new ItemStack(AEBlocks.MYSTERIOUS_CUBE, 1),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/not_so_mysterious_cube_to_mysterious_cube"));
 
-        assembly(Ingredient.of(new ItemStack(Blocks.TNT, 1)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(Blocks.TNT, 1)),
                 new ItemStack(AEBlocks.TINY_TNT, 8),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/tnt_to_tiny_tnt"));
 
-        assembly(Ingredient.of(new ItemStack(AEItems.MATTER_BALL, 64)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(AEItems.MATTER_BALL, 64)),
                 new ItemStack(AEItems.SINGULARITY, 1),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/matter_ball_to_singularity"));
 
-        assembly(Ingredient.of(new ItemStack(AEItems.CERTUS_QUARTZ_CRYSTAL, 1)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(AEItems.CERTUS_QUARTZ_CRYSTAL, 1)),
                 new ItemStack(AEItems.CALCULATION_PROCESSOR_PRINT, 1),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/certus_quartz_crystal_to_calculation_processor_print"));
 
-        assembly(Ingredient.of(new ItemStack(Items.DIAMOND, 1)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(Items.DIAMOND, 1)),
                 new ItemStack(AEItems.ENGINEERING_PROCESSOR_PRINT, 1),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/diamond_to_engineering_processor_print"));
 
-        assembly(Ingredient.of(new ItemStack(Items.GOLD_INGOT, 1)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(Items.GOLD_INGOT, 1)),
                 new ItemStack(AEItems.LOGIC_PROCESSOR_PRINT, 1),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/gold_ingot_to_logic_processor_print"));
 
-        assembly(Ingredient.of(new ItemStack(AEItems.SILICON, 1)),
+        assembly(StackedIngredient.fromStacks(new ItemStack(AEItems.SILICON, 1)),
                 new ItemStack(AEItems.SILICON_PRINT, 1),
                 AssemblyRecipe.AssemblyProgramType.LASER)
                 .build(recipeOutput, AppliedPneumatics.makeId("assembly/silicon_to_silicon_print"));

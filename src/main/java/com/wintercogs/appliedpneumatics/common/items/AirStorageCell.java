@@ -143,6 +143,7 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
 
     private boolean disassembleDrive(ItemStack stack, Level level, Player player)
     {
+        if(!player.isShiftKeyDown()) return false;
         Recipe<?> recipe = level.getRecipeManager().byKey(this.getRecipeId()).orElse(null);
         if (recipe instanceof CraftingRecipe)
         {
