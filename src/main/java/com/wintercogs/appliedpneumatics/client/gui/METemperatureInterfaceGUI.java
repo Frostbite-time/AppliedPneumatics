@@ -37,7 +37,7 @@ public class METemperatureInterfaceGUI extends UpgradeableScreen<METemperatureIn
     @Override
     public void drawFG(GuiGraphics guiGraphics, int offsetX, int offsetY, int mouseX, int mouseY)
     {
-        /** 有关温度的部分，减去273，转为摄氏度 */
+        // 有关温度的部分，减去273，转为摄氏度
         super.drawFG(guiGraphics, offsetX, offsetY, mouseX, mouseY);
         String temperatureStr = String.format(Locale.ROOT, "%.1f", menu.latestTemperature - 273) + "℃";
         String heatCapStr = String.format(Locale.ROOT, "%.0f", menu.latestHeatCap);

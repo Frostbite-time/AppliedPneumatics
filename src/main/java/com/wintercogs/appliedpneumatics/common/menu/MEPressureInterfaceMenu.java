@@ -36,7 +36,6 @@ public class MEPressureInterfaceMenu extends UpgradeableMenu<MEPressureInterface
     @Override
     protected void setupInventorySlots()
     {
-        // 你的机器输入槽（示例：索引0）
         AppEngSlot slot = new AppEngSlot(getHost().getInventory(), 0);
         // 用 AE 的语义化添加
         this.addSlot(slot, SlotSemantics.MACHINE_INPUT);
