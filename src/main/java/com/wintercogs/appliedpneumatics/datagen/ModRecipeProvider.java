@@ -63,7 +63,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         StackedIngredient.fromStacks(new ItemStack(ModItems.PRINTED_CIRCUIT_BOARD.get(), 1)),
                         StackedIngredient.fromStacks(new ItemStack(ModItems.NETWORK_DATA_STORAGE.get(), 1)),
                         StackedIngredient.fromStacks(new ItemStack(APItems.AIR_CELL_SHELL.get(), 1))),
-                5f,
+                4.95f,
                 new ItemStack(APItems.MEGA_AIR_CELL_SHELL.get()))
                 .addCondition(new ModLoadedCondition(AppliedPneumatics.MEGA_CELL_MODID))
                 .build(recipeOutput, housingShapedId(APItems.MEGA_AIR_CELL_SHELL.get()));

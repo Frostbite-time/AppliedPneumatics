@@ -1,6 +1,7 @@
 package com.wintercogs.appliedpneumatics.client.gui.widgets;
 
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
+import com.wintercogs.appliedpneumatics.util.AmadronOfferHelper;
 import com.wintercogs.appliedpneumatics.util.IngredientRenderer;
 import me.desht.pneumaticcraft.api.crafting.AmadronTradeResource;
 import me.desht.pneumaticcraft.api.crafting.recipe.AmadronRecipe;
@@ -95,7 +96,7 @@ public class AmadronOfferPanel extends AbstractWidget
     /** 工厂：用配方 id 构造面板（客户端侧） */
     public static AmadronOfferPanel fromOfferId(int x, int y, ResourceLocation id, onPress runnable)
     {
-        var offer = me.desht.pneumaticcraft.common.amadron.AmadronOfferManager.getInstance().getOffer(id);
+        var offer = AmadronOfferHelper.getActiveOffer(id);
         return new AmadronOfferPanel(x, y, id, offer, runnable);
     }
 

@@ -12,6 +12,7 @@ import appeng.client.gui.widgets.SettingToggleButton;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.client.gui.widgets.AmadronOfferPanel;
 import com.wintercogs.appliedpneumatics.common.menu.AmadronWirelessTerminalMenu;
+import com.wintercogs.appliedpneumatics.util.AmadronOfferHelper;
 import me.desht.pneumaticcraft.api.crafting.recipe.AmadronRecipe;
 import me.desht.pneumaticcraft.common.amadron.AmadronOfferManager;
 import me.desht.pneumaticcraft.common.amadron.ShoppingBasket;
@@ -322,7 +323,7 @@ public class AmadronWirelessTerminalGUI extends UpgradeableScreen<AmadronWireles
         String needle = q.toLowerCase(Locale.ROOT);
         if (id.toString().toLowerCase(Locale.ROOT).contains(needle)) return true;
 
-        AmadronRecipe offer = AmadronOfferManager.getInstance().getOffer(id);
+        AmadronRecipe offer = AmadronOfferHelper.getActiveOffer(id);
         if (offer == null) return false;
 
         String inName = safeNameLower(offer, true);
