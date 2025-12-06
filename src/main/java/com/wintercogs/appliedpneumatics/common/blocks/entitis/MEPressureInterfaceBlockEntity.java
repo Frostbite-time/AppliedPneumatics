@@ -365,15 +365,25 @@ public class MEPressureInterfaceBlockEntity extends AENetworkBlockEntity impleme
     public void addAdditionalDrops(Level level, BlockPos pos, List<ItemStack> drops)
     {
         super.addAdditionalDrops(level, pos, drops);
-        ItemStack dropStack = inventory.getStackInSlot(0);
-        if(!dropStack.isEmpty())
-            drops.add(dropStack);
-
+        for(int i = 0; i < inventory.size(); i++)
+        {
+            ItemStack slotContent = inventory.getStackInSlot(i);
+            if(slotContent.isEmpty()) continue;
+            drops.add(slotContent.copy());
+        }
         for(int i = 0; i < upgrades.size(); i++)
         {
             ItemStack slotContent = upgrades.getStackInSlot(i);
             if(slotContent.isEmpty()) continue;
             drops.add(slotContent.copy());
         }
+    }
+
+    @Override
+    public void clearContent()
+    {
+        super.clearContent();
+        inventory.clear();
+        upgrades.clear();
     }
 }

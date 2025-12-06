@@ -336,6 +336,16 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkBlockEntity imp
         cancelAllJobs(Component.translatable("amadron.appliedpneumatics.process_fail.block_break", worldPosition.toShortString()));
     }
 
+    @Override
+    public void clearContent()
+    {
+        super.clearContent();
+        patternInventory.clear();
+        upgrades.clear();
+        inputInv.clear();
+        outputInv.clear();
+    }
+
     // ICraftProvider实现---------------------------------------------------------------------------------------
     @Override
     public List<IPatternDetails> getAvailablePatterns()
