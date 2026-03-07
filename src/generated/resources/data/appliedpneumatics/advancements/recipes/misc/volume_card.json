@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "appliedpneumatics:volume_card"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "unlock_volume_card": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ae2:advanced_card"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "unlock_volume_card",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "appliedpneumatics:volume_card"
+    ]
+  },
+  "sends_telemetry_event": false
+}

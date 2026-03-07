@@ -1,0 +1,12 @@
+{
+  "type": "pneumaticcraft:assembly_laser",
+  "input": {
+    "type": "pneumaticcraft:stacked_item",
+    "count": 1,
+    "item": "ae2:not_so_mysterious_cube"
+  },
+  "program": "laser",
+  "result": {
+    "item": "ae2:mysterious_cube"
+  }
+}

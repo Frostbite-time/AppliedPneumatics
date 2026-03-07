@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "appliedpneumatics:item/led/portable_cell_screen",
+    "layer1": "appliedpneumatics:item/led/portable_cell_led",
+    "layer2": "appliedpneumatics:item/portable_cell_air_housing",
+    "layer3": "appliedpneumatics:item/portable_cell_side_256k"
+  }
+}

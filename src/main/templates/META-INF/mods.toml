@@ -80,6 +80,20 @@ description='''${mod_description}'''
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
+# Applied Energistics（应用能源）
+[[dependencies.${mod_id}]]
+    modId = "ae2"
+    mandatory = true
+    versionRange = "[15.1.0,16)"
+    ordering = "AFTER"
+    side=  "BOTH"
+# PneumaticCraft（气动工艺）
+[[dependencies.${mod_id}]]
+    modId="pneumaticcraft"
+    mandatory = true
+    versionRange="[6.0.0,)"
+    ordering="AFTER"
+    side="BOTH"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't

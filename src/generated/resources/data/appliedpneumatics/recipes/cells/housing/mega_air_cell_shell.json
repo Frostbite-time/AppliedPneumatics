@@ -1,0 +1,47 @@
+{
+  "type": "pneumaticcraft:pressure_chamber",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "megacells"
+    }
+  ],
+  "inputs": [
+    {
+      "type": "pneumaticcraft:stacked_item",
+      "count": 2,
+      "item": "pneumaticcraft:reinforced_pressure_tube"
+    },
+    {
+      "type": "pneumaticcraft:stacked_item",
+      "count": 2,
+      "item": "megacells:sky_steel_ingot"
+    },
+    {
+      "type": "pneumaticcraft:stacked_item",
+      "count": 2,
+      "item": "pneumaticcraft:compressed_iron_gear"
+    },
+    {
+      "type": "pneumaticcraft:stacked_item",
+      "count": 1,
+      "item": "pneumaticcraft:printed_circuit_board"
+    },
+    {
+      "type": "pneumaticcraft:stacked_item",
+      "count": 1,
+      "item": "pneumaticcraft:network_data_storage"
+    },
+    {
+      "type": "pneumaticcraft:stacked_item",
+      "count": 1,
+      "item": "appliedpneumatics:air_cell_shell"
+    }
+  ],
+  "pressure": 4.95,
+  "results": [
+    {
+      "item": "appliedpneumatics:mega_air_cell_shell"
+    }
+  ]
+}

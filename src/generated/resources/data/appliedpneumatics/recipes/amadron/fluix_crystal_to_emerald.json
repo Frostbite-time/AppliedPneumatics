@@ -1,0 +1,16 @@
+{
+  "type": "pneumaticcraft:amadron",
+  "id": "appliedpneumatics:amadron/fluix_crystal_to_emerald",
+  "input": {
+    "type": "ITEM",
+    "amount": 16,
+    "id": "ae2:fluix_crystal"
+  },
+  "level": 0,
+  "output": {
+    "type": "ITEM",
+    "amount": 4,
+    "id": "minecraft:emerald"
+  },
+  "static": true
+}

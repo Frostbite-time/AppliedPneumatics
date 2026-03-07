@@ -1,0 +1,34 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "expatternprovider"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shapeless",
+        "category": "misc",
+        "ingredients": [
+          {
+            "item": "appliedpneumatics:me_amadron_process_station"
+          },
+          {
+            "item": "appliedpneumatics:me_amadron_process_station"
+          },
+          {
+            "item": "ae2:capacity_card"
+          },
+          {
+            "item": "ae2:capacity_card"
+          }
+        ],
+        "result": {
+          "item": "appliedpneumatics:me_amadron_extended_process_station"
+        }
+      }
+    }
+  ]
+}

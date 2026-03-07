@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "appliedpneumatics:me_amadron_process_station"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "unlock_me_amadron_process_station": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "appliedpneumatics:amadron_wireless_terminal"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "unlock_me_amadron_process_station",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "appliedpneumatics:me_amadron_process_station"
+    ]
+  },
+  "sends_telemetry_event": false
+}

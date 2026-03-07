@@ -1,0 +1,34 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "megacells"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shapeless",
+        "category": "misc",
+        "ingredients": [
+          {
+            "item": "megacells:cell_component_16m"
+          },
+          {
+            "item": "ae2:chest"
+          },
+          {
+            "item": "ae2:energy_cell"
+          },
+          {
+            "item": "appliedpneumatics:mega_air_cell_shell"
+          }
+        ],
+        "result": {
+          "item": "appliedpneumatics:portable_air_cell_16m"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "type": "pneumaticcraft:amadron",
+  "id": "appliedpneumatics:amadron/certus_quartz_crystal_to_emerald",
+  "input": {
+    "type": "ITEM",
+    "amount": 16,
+    "id": "ae2:certus_quartz_crystal"
+  },
+  "level": 0,
+  "output": {
+    "type": "ITEM",
+    "amount": 8,
+    "id": "minecraft:emerald"
+  },
+  "static": true
+}

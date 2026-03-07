@@ -1,0 +1,16 @@
+{
+  "type": "pneumaticcraft:amadron",
+  "id": "appliedpneumatics:amadron/singularity_to_emerald",
+  "input": {
+    "type": "ITEM",
+    "amount": 1,
+    "id": "ae2:singularity"
+  },
+  "level": 0,
+  "output": {
+    "type": "ITEM",
+    "amount": 99,
+    "id": "minecraft:emerald"
+  },
+  "static": true
+}

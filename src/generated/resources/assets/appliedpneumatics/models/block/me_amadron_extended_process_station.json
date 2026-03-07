@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "appliedpneumatics:block/me_amadron_extended_process_station"
+  }
+}

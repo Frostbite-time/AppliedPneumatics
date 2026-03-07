@@ -1,0 +1,16 @@
+{
+  "type": "pneumaticcraft:amadron",
+  "id": "appliedpneumatics:amadron/sky_stone_block_to_emerald",
+  "input": {
+    "type": "ITEM",
+    "amount": 32,
+    "id": "ae2:sky_stone_block"
+  },
+  "level": 0,
+  "output": {
+    "type": "ITEM",
+    "amount": 10,
+    "id": "minecraft:emerald"
+  },
+  "static": true
+}

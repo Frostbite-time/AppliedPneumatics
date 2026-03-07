@@ -1,0 +1,31 @@
+{
+  "type": "pneumaticcraft:pressure_chamber",
+  "inputs": [
+    {
+      "type": "pneumaticcraft:stacked_item",
+      "count": 2,
+      "item": "pneumaticcraft:pressure_tube"
+    },
+    {
+      "type": "pneumaticcraft:stacked_item",
+      "count": 3,
+      "item": "pneumaticcraft:pressure_chamber_glass"
+    },
+    {
+      "type": "pneumaticcraft:stacked_item",
+      "count": 2,
+      "item": "pneumaticcraft:ingot_iron_compressed"
+    },
+    {
+      "type": "pneumaticcraft:stacked_item",
+      "count": 1,
+      "item": "pneumaticcraft:pressure_gauge"
+    }
+  ],
+  "pressure": 4.0,
+  "results": [
+    {
+      "item": "appliedpneumatics:air_cell_shell"
+    }
+  ]
+}

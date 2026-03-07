@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "pneumaticcraft:compressed_iron_block"
+    },
+    "B": {
+      "item": "pneumaticcraft:vortex_tube"
+    },
+    "C": {
+      "item": "pneumaticcraft:advanced_air_compressor"
+    },
+    "D": {
+      "item": "ae2:annihilation_core"
+    },
+    "E": {
+      "item": "ae2:formation_core"
+    }
+  },
+  "pattern": [
+    "ABA",
+    "DCE",
+    "ABA"
+  ],
+  "result": {
+    "item": "appliedpneumatics:me_temperature_interface"
+  },
+  "show_notification": true
+}

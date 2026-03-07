@@ -1,0 +1,8 @@
+{
+  "values": [
+    "appliedpneumatics:me_pressure_interface_block",
+    "appliedpneumatics:me_amadron_process_station",
+    "appliedpneumatics:me_temperature_interface",
+    "appliedpneumatics:me_amadron_extended_process_station"
+  ]
+}

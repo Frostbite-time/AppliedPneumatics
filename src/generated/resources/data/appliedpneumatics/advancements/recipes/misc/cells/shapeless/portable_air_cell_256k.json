@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_correct_component": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ae2:cell_component_256k"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "appliedpneumatics:cells/shapeless/portable_air_cell_256k"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_correct_component",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "appliedpneumatics:cells/shapeless/portable_air_cell_256k"
+    ]
+  },
+  "sends_telemetry_event": false
+}

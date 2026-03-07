@@ -1,0 +1,13 @@
+{
+  "type": "pneumaticcraft:assembly_laser",
+  "input": {
+    "type": "pneumaticcraft:stacked_item",
+    "count": 1,
+    "item": "minecraft:tnt"
+  },
+  "program": "laser",
+  "result": {
+    "count": 8,
+    "item": "ae2:tiny_tnt"
+  }
+}

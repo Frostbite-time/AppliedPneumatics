@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "temperature_state=high_temperature": {
+      "model": "appliedpneumatics:me_temperature_interface/high_temperature"
+    },
+    "temperature_state=low_temperature": {
+      "model": "appliedpneumatics:me_temperature_interface/low_temperature"
+    },
+    "temperature_state=room_temperature": {
+      "model": "appliedpneumatics:me_temperature_interface/room_temperature"
+    }
+  }
+}

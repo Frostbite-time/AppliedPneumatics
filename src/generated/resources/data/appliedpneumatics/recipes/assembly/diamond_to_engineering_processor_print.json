@@ -1,0 +1,12 @@
+{
+  "type": "pneumaticcraft:assembly_laser",
+  "input": {
+    "type": "pneumaticcraft:stacked_item",
+    "count": 1,
+    "item": "minecraft:diamond"
+  },
+  "program": "laser",
+  "result": {
+    "item": "ae2:printed_engineering_processor"
+  }
+}

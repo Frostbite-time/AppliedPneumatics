@@ -1,0 +1,12 @@
+{
+  "type": "pneumaticcraft:assembly_drill",
+  "input": {
+    "type": "pneumaticcraft:stacked_item",
+    "count": 8,
+    "item": "ae2:energy_cell"
+  },
+  "program": "drill",
+  "result": {
+    "item": "ae2:dense_energy_cell"
+  }
+}
