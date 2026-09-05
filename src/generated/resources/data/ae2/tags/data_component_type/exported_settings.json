@@ -1,0 +1,6 @@
+{
+  "values": [
+    "appliedpneumatics:expected_temperature",
+    "appliedpneumatics:expected_pressure"
+  ]
+}

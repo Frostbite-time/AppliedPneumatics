@@ -16,8 +16,10 @@ import appeng.blockentity.ServerTickingBlockEntity;
 import appeng.blockentity.grid.AENetworkedBlockEntity;
 import appeng.util.inv.AppEngInternalInventory;
 import appeng.util.inv.filter.IAEItemFilter;
+import appeng.util.SettingsFrom;
 import com.wintercogs.appliedpneumatics.common.init.APBlockEntities;
 import com.wintercogs.appliedpneumatics.common.init.APBlocks;
+import com.wintercogs.appliedpneumatics.common.init.APDataComponents;
 import com.wintercogs.appliedpneumatics.common.init.APItems;
 import com.wintercogs.appliedpneumatics.common.me.keys.AirKey;
 import me.desht.pneumaticcraft.api.PNCCapabilities;
@@ -29,7 +31,9 @@ import me.desht.pneumaticcraft.common.util.PneumaticCraftUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -143,6 +147,30 @@ public class MEPressureInterfaceBlockEntity extends AENetworkedBlockEntity imple
         expectedPressure = Math.max(bottomPressure, expectedPressure);
         this.expectedPressure = expectedPressure;
         setChanged();
+    }
+
+    @Override
+    public void exportSettings(SettingsFrom mode, DataComponentMap.Builder builder, @Nullable Player player)
+    {
+        super.exportSettings(mode, builder, player);
+        if (mode == SettingsFrom.MEMORY_CARD)
+        {
+            builder.set(APDataComponents.EXPECTED_PRESSURE, expectedPressure);
+        }
+    }
+
+    @Override
+    public void importSettings(SettingsFrom mode, DataComponentMap input, @Nullable Player player)
+    {
+        super.importSettings(mode, input, player);
+        if (mode == SettingsFrom.MEMORY_CARD)
+        {
+            var expected = input.get(APDataComponents.EXPECTED_PRESSURE.get());
+            if (expected != null)
+            {
+                setExpectedPressure(expected);
+            }
+        }
     }
 
     /**

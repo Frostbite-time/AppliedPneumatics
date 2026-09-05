@@ -5,6 +5,7 @@ import appeng.api.config.Actionable;
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.crafting.PatternDetailsHelper;
 import appeng.api.implementations.blockentities.PatternContainerGroup;
+import appeng.api.ids.AEComponents;
 import appeng.api.inventories.InternalInventory;
 import appeng.api.networking.GridFlags;
 import appeng.api.networking.IGrid;
@@ -19,13 +20,16 @@ import appeng.api.upgrades.UpgradeInventories;
 import appeng.blockentity.ServerTickingBlockEntity;
 import appeng.blockentity.grid.AENetworkedBlockEntity;
 import appeng.core.definitions.AEItems;
+import appeng.core.localization.PlayerMessages;
 import appeng.helpers.IPriorityHost;
 import appeng.helpers.externalstorage.GenericStackInv;
 import appeng.helpers.patternprovider.PatternContainer;
 import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
 import appeng.menu.locator.MenuLocators;
+import appeng.util.SettingsFrom;
 import appeng.util.inv.AppEngInternalInventory;
+import appeng.util.inv.PlayerInternalInventory;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.api.GenericInv.CombinedGenericInternalInventory;
 import com.wintercogs.appliedpneumatics.api.GenericInv.GenericStackInvWrapper;
@@ -50,6 +54,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -57,6 +62,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -296,6 +302,114 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkedBlockEntity i
         this.priority = priority;
         ICraftingProvider.requestUpdate(getMainNode());
         setChanged();
+    }
+
+    /**
+     * 按 AE 样板供应器的语义，把当前亚马龙样板保存到内存卡。
+     */
+    @Override
+    public void exportSettings(SettingsFrom mode, DataComponentMap.Builder builder, @Nullable Player player)
+    {
+        super.exportSettings(mode, builder, player);
+        if (mode == SettingsFrom.MEMORY_CARD)
+        {
+            builder.set(AEComponents.EXPORTED_PATTERNS, patternInventory.toItemContainerContents());
+        }
+    }
+
+    /**
+     * 从内存卡恢复亚马龙样板。和 PatternProviderLogic 一样，恢复每个编码样板消耗一个空白样板。
+     */
+    @Override
+    public void importSettings(SettingsFrom mode, DataComponentMap input, @Nullable Player player)
+    {
+        super.importSettings(mode, input, player);
+        if (mode == SettingsFrom.MEMORY_CARD && player != null && !player.level().isClientSide)
+        {
+            importPatternsFromMemoryCard(input, player);
+        }
+    }
+
+    private void importPatternsFromMemoryCard(DataComponentMap input, Player player)
+    {
+        var savedPatterns = input.getOrDefault(AEComponents.EXPORTED_PATTERNS, ItemContainerContents.EMPTY);
+
+        clearPatternInventoryForMemoryCard(player);
+
+        var desiredPatterns = new AppEngInternalInventory(patternInventory.size());
+        desiredPatterns.fromItemContainerContents(savedPatterns);
+
+        var playerInventory = player.getInventory();
+        int blankPatternsAvailable = player.getAbilities().instabuild
+                ? Integer.MAX_VALUE
+                : playerInventory.countItem(AEItems.BLANK_PATTERN.asItem());
+        int blankPatternsUsed = 0;
+
+        for (int i = 0; i < desiredPatterns.size(); i++)
+        {
+            ItemStack desiredPattern = desiredPatterns.getStackInSlot(i);
+            if (desiredPattern.isEmpty() || !desiredPattern.is(APItems.AMADRON_PATTERN.get()))
+            {
+                continue;
+            }
+
+            IPatternDetails pattern = PatternDetailsHelper.decodePattern(desiredPattern, level);
+            if (!(pattern instanceof AmadronPatternDetails))
+            {
+                continue;
+            }
+
+            ++blankPatternsUsed;
+            if (blankPatternsAvailable >= blankPatternsUsed)
+            {
+                if (!patternInventory.addItems(desiredPattern.copyWithCount(1)).isEmpty())
+                {
+                    blankPatternsUsed--;
+                }
+            }
+        }
+
+        if (blankPatternsUsed > 0 && !player.getAbilities().instabuild)
+        {
+            new PlayerInternalInventory(playerInventory)
+                    .removeItems(blankPatternsUsed, AEItems.BLANK_PATTERN.stack(), null);
+        }
+
+        if (blankPatternsUsed > blankPatternsAvailable)
+        {
+            player.sendSystemMessage(PlayerMessages.MissingBlankPatterns.text(
+                    blankPatternsUsed - blankPatternsAvailable));
+        }
+    }
+
+    /** 把当前编码样板还原为空白样板并交还玩家，仿照 AE 的 PatternProviderLogic。 */
+    private void clearPatternInventoryForMemoryCard(Player player)
+    {
+        if (player.getAbilities().instabuild)
+        {
+            for (int i = 0; i < patternInventory.size(); i++)
+            {
+                patternInventory.setItemDirect(i, ItemStack.EMPTY);
+            }
+            return;
+        }
+
+        var playerInventory = player.getInventory();
+        int blankPatternCount = 0;
+        for (int i = 0; i < patternInventory.size(); i++)
+        {
+            ItemStack pattern = patternInventory.getStackInSlot(i);
+            if (!pattern.isEmpty())
+            {
+                blankPatternCount += pattern.getCount();
+            }
+            patternInventory.setItemDirect(i, ItemStack.EMPTY);
+        }
+
+        if (blankPatternCount > 0)
+        {
+            playerInventory.placeItemBackInInventory(AEItems.BLANK_PATTERN.stack(blankPatternCount), false);
+        }
     }
 
     // 终端状态实现 ----------------------------------------------------------------------------------------------------

@@ -45,6 +45,7 @@ public class DataGenerators
         generator.addProvider(event.includeServer(), blockTagsProvider);
         generator.addProvider(event.includeServer(), new ModItemTagProvider(packOutput,lookupProvider,blockTagsProvider.contentsGetter(),existingFileHelper));
         generator.addProvider(event.includeServer(), new ModFluidTagsProvider(packOutput,lookupProvider,existingFileHelper));
+        generator.addProvider(event.includeServer(), new ModDataComponentTypeTagProvider(packOutput,lookupProvider,existingFileHelper));
 
         // 生成配方表
         generator.addProvider(event.includeServer(),new ModRecipeProvider(packOutput,lookupProvider));

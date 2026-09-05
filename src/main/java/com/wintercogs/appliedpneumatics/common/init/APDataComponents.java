@@ -39,6 +39,15 @@ public class APDataComponents
             "amadron_pattern", builder -> builder.persistent(EncodedAmadronPattern.CODEC).networkSynchronized(EncodedAmadronPattern.STREAM_CODEC)
     );
 
+    // 内存卡保存的接口目标值
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> EXPECTED_TEMPERATURE = register(
+            "expected_temperature", builder -> builder.persistent(Codec.DOUBLE).networkSynchronized(ByteBufCodecs.DOUBLE)
+    );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> EXPECTED_PRESSURE = register(
+            "expected_pressure", builder -> builder.persistent(Codec.FLOAT).networkSynchronized(ByteBufCodecs.FLOAT)
+    );
+
 
     private static <T> DeferredHolder<DataComponentType<?>,DataComponentType<T>> register(String name, UnaryOperator<DataComponentType.Builder<T>> builder) {
         return DATA_COMPONENTS.register(name,()->  builder.apply(DataComponentType.builder()).build());
