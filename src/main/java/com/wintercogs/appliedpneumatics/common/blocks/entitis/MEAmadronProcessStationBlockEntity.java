@@ -20,13 +20,16 @@ import appeng.blockentity.ServerTickingBlockEntity;
 import appeng.blockentity.grid.AENetworkBlockEntity;
 import appeng.capabilities.Capabilities;
 import appeng.core.definitions.AEItems;
+import appeng.core.localization.PlayerMessages;
 import appeng.helpers.IPriorityHost;
 import appeng.helpers.externalstorage.GenericStackInv;
 import appeng.helpers.patternprovider.PatternContainer;
 import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
 import appeng.menu.locator.MenuLocators;
+import appeng.util.SettingsFrom;
 import appeng.util.inv.AppEngInternalInventory;
+import appeng.util.inv.PlayerInternalInventory;
 import com.wintercogs.appliedpneumatics.AppliedPneumatics;
 import com.wintercogs.appliedpneumatics.api.GenericInv.CombinedGenericInternalInventory;
 import com.wintercogs.appliedpneumatics.api.GenericInv.GenericStackInvWrapper;
@@ -254,6 +257,114 @@ public class MEAmadronProcessStationBlockEntity extends AENetworkBlockEntity imp
         this.priority = priority;
         ICraftingProvider.requestUpdate(getMainNode());
         setChanged();
+    }
+
+    /**
+     * 按 AE 样板供应器的语义，把当前亚马龙样板保存到内存卡。
+     */
+    @Override
+    public void exportSettings(SettingsFrom mode, CompoundTag tag, @Nullable Player player)
+    {
+        super.exportSettings(mode, tag, player);
+        if (mode == SettingsFrom.MEMORY_CARD)
+        {
+            patternInventory.writeToNBT(tag, "patterns");
+        }
+    }
+
+    /**
+     * 从内存卡恢复亚马龙样板。和 PatternProviderLogic 一样，恢复每个编码样板消耗一个空白样板。
+     */
+    @Override
+    public void importSettings(SettingsFrom mode, CompoundTag tag, @Nullable Player player)
+    {
+        super.importSettings(mode, tag, player);
+        if (mode == SettingsFrom.MEMORY_CARD && player != null && !player.level().isClientSide)
+        {
+            importPatternsFromMemoryCard(tag, player);
+        }
+    }
+
+    private void importPatternsFromMemoryCard(CompoundTag tag, Player player)
+    {
+        clearPatternInventoryForMemoryCard(player);
+
+        var desiredPatterns = new AppEngInternalInventory(patternInventory.size());
+        desiredPatterns.readFromNBT(tag, "patterns");
+
+        var playerInventory = player.getInventory();
+        int blankPatternsAvailable = player.getAbilities().instabuild
+                ? Integer.MAX_VALUE
+                : playerInventory.countItem(AEItems.BLANK_PATTERN.asItem());
+        int blankPatternsUsed = 0;
+
+        for (int i = 0; i < desiredPatterns.size(); i++)
+        {
+            ItemStack desiredPattern = desiredPatterns.getStackInSlot(i);
+            if (desiredPattern.isEmpty() || desiredPattern.getItem() != APItems.AMADRON_PATTERN.get())
+            {
+                continue;
+            }
+
+            IPatternDetails pattern = PatternDetailsHelper.decodePattern(desiredPattern, level);
+            if (!(pattern instanceof AmadronPatternDetails))
+            {
+                continue;
+            }
+
+            ++blankPatternsUsed;
+            if (blankPatternsAvailable >= blankPatternsUsed)
+            {
+                ItemStack restoredPattern = desiredPattern.copy();
+                restoredPattern.setCount(1);
+                if (!patternInventory.addItems(restoredPattern).isEmpty())
+                {
+                    blankPatternsUsed--;
+                }
+            }
+        }
+
+        if (blankPatternsUsed > 0 && !player.getAbilities().instabuild)
+        {
+            new PlayerInternalInventory(playerInventory)
+                    .removeItems(blankPatternsUsed, AEItems.BLANK_PATTERN.stack(), null);
+        }
+
+        if (blankPatternsUsed > blankPatternsAvailable)
+        {
+            player.sendSystemMessage(PlayerMessages.MissingBlankPatterns.text(
+                    blankPatternsUsed - blankPatternsAvailable));
+        }
+    }
+
+    /** 把当前样板还原为空白样板并交还玩家，仿照 AE 的 PatternProviderLogic。 */
+    private void clearPatternInventoryForMemoryCard(Player player)
+    {
+        if (player.getAbilities().instabuild)
+        {
+            for (int i = 0; i < patternInventory.size(); i++)
+            {
+                patternInventory.setItemDirect(i, ItemStack.EMPTY);
+            }
+            return;
+        }
+
+        var playerInventory = player.getInventory();
+        int blankPatternCount = 0;
+        for (int i = 0; i < patternInventory.size(); i++)
+        {
+            ItemStack pattern = patternInventory.getStackInSlot(i);
+            if (!pattern.isEmpty())
+            {
+                blankPatternCount += pattern.getCount();
+            }
+            patternInventory.setItemDirect(i, ItemStack.EMPTY);
+        }
+
+        if (blankPatternCount > 0)
+        {
+            playerInventory.placeItemBackInInventory(AEItems.BLANK_PATTERN.stack(blankPatternCount), false);
+        }
     }
 
     // 终端状态实现 ----------------------------------------------------------------------------------------------------

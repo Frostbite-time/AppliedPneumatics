@@ -14,6 +14,7 @@ import appeng.api.upgrades.UpgradeInventories;
 import appeng.blockentity.ServerTickingBlockEntity;
 import appeng.blockentity.grid.AENetworkBlockEntity;
 import appeng.core.definitions.AEItems;
+import appeng.util.SettingsFrom;
 import com.wintercogs.appliedpneumatics.common.init.APBlockEntities;
 import com.wintercogs.appliedpneumatics.common.init.APBlockStates;
 import com.wintercogs.appliedpneumatics.common.init.APBlocks;
@@ -25,6 +26,8 @@ import me.desht.pneumaticcraft.common.heat.HeatExchangerManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -104,6 +107,27 @@ public class METemperatureInterfaceBlockEntity extends AENetworkBlockEntity impl
     public void setExpectedTemperature(double expectedTemperature)
     {
         this.expectedTemperature = Math.min(2273, Math.max(0, expectedTemperature));
+        setChanged();
+    }
+
+    @Override
+    public void exportSettings(SettingsFrom mode, CompoundTag tag, @Nullable Player player)
+    {
+        super.exportSettings(mode, tag, player);
+        if (mode == SettingsFrom.MEMORY_CARD)
+        {
+            tag.putDouble("expected_temperature", expectedTemperature);
+        }
+    }
+
+    @Override
+    public void importSettings(SettingsFrom mode, CompoundTag tag, @Nullable Player player)
+    {
+        super.importSettings(mode, tag, player);
+        if (mode == SettingsFrom.MEMORY_CARD && tag.contains("expected_temperature", Tag.TAG_DOUBLE))
+        {
+            setExpectedTemperature(tag.getDouble("expected_temperature"));
+        }
     }
 
     /**
