@@ -23,10 +23,10 @@ public class MEAmadronProcessStation extends AEBaseEntityBlock<MEAmadronProcessS
     @Override
     protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hitResult)
     {
-        super.useWithoutItem(state,level,pos,player,hitResult);
-        if(!level.isClientSide()&&!player.isShiftKeyDown())
+        super.useWithoutItem(state, level, pos, player, hitResult);
+        if (!level.isClientSide() && !player.isShiftKeyDown())
         {
-            if(level.getBlockEntity(pos) instanceof MEAmadronProcessStationBlockEntity be)
+            if (level.getBlockEntity(pos) instanceof MEAmadronProcessStationBlockEntity be)
                 MenuOpener.open(APMenus.ME_AMADRON_PROCESS_STATION_MENU.get(), player, MenuLocators.forBlockEntity(be));
         }
         return InteractionResult.SUCCESS_NO_ITEM_USED;

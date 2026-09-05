@@ -16,9 +16,12 @@ public class METemperatureInterfaceMenu extends UpgradeableMenu<METemperatureInt
 
     // @GuiSync 同步字段（客户端可见最新值，走AE的DataSynchronization同步方案）
     // id从10开始，避免和父类冲突
-    @GuiSync(10) public double latestTemperature = 0;
-    @GuiSync(11) public double latestHeatCap = 0;
-    @GuiSync(12) public double latestExpectedTemperature = 0f;
+    @GuiSync(10)
+    public double latestTemperature = 0;
+    @GuiSync(11)
+    public double latestHeatCap = 0;
+    @GuiSync(12)
+    public double latestExpectedTemperature = 0f;
 
     public METemperatureInterfaceMenu(int id, Inventory playerInv, @NotNull METemperatureInterfaceBlockEntity host)
     {

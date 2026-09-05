@@ -64,7 +64,7 @@ public class AirContainerItemStrategy implements ContainerItemStrategy<AirKey, A
         long available = Math.max(0, airHandler.getAir());
         long wantExtract = Math.min(available, amount);
         int maxExtract = APMath.ClampToInt(wantExtract);
-        if(!mode.isSimulate() && maxExtract > 0)
+        if (!mode.isSimulate() && maxExtract > 0)
         {
             stack.shrink(1);
             airHandler.addAir(-maxExtract);
@@ -80,14 +80,15 @@ public class AirContainerItemStrategy implements ContainerItemStrategy<AirKey, A
         ItemStack stack = context.getStack();
         ItemStack copy = stack.copyWithCount(1);
         IAirHandler airHandler = copy.getCapability(PNCCapabilities.AIR_HANDLER_ITEM);
-        if (airHandler == null) {
+        if (airHandler == null)
+        {
             return 0;
         }
 
         long space = Math.max(0, AirHandlerHelper.getMaxAirInAirHandler(airHandler) - airHandler.getAir());
         long wantInsert = Math.min(space, amount);
         int maxInsert = APMath.ClampToInt(wantInsert);
-        if(!mode.isSimulate() && maxInsert > 0)
+        if (!mode.isSimulate() && maxInsert > 0)
         {
             stack.shrink(1);
             airHandler.addAir(maxInsert);
@@ -122,7 +123,8 @@ public class AirContainerItemStrategy implements ContainerItemStrategy<AirKey, A
         return getContainedStack(context.getStack());
     }
 
-    interface Context {
+    interface Context
+    {
         ItemStack getStack();
 
         void setStack(ItemStack stack);
@@ -133,19 +135,25 @@ public class AirContainerItemStrategy implements ContainerItemStrategy<AirKey, A
     private record CarriedContext(Player player, AbstractContainerMenu menu) implements Context
     {
         @Override
-        public ItemStack getStack() {
+        public ItemStack getStack()
+        {
             return menu.getCarried();
         }
 
         @Override
-        public void setStack(ItemStack stack) {
+        public void setStack(ItemStack stack)
+        {
             menu.setCarried(stack);
         }
 
-        public void addOverflow(ItemStack stack) {
-            if (menu.getCarried().isEmpty()) {
+        public void addOverflow(ItemStack stack)
+        {
+            if (menu.getCarried().isEmpty())
+            {
                 menu.setCarried(stack);
-            } else {
+            }
+            else
+            {
                 player.getInventory().placeItemBackInInventory(stack);
             }
         }
@@ -154,16 +162,19 @@ public class AirContainerItemStrategy implements ContainerItemStrategy<AirKey, A
     private record PlayerInvContext(Player player, int slot) implements Context
     {
         @Override
-        public ItemStack getStack() {
+        public ItemStack getStack()
+        {
             return player.getInventory().getItem(slot);
         }
 
         @Override
-        public void setStack(ItemStack stack) {
+        public void setStack(ItemStack stack)
+        {
             player.getInventory().setItem(slot, stack);
         }
 
-        public void addOverflow(ItemStack stack) {
+        public void addOverflow(ItemStack stack)
+        {
             player.getInventory().placeItemBackInInventory(stack);
         }
     }

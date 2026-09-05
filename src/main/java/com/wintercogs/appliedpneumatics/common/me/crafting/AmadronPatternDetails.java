@@ -36,18 +36,18 @@ public class AmadronPatternDetails implements IPatternDetails
 
         EncodedAmadronPattern pattern = definition.get(APDataComponents.AMADRON_PATTERN.get());
 
-        if(pattern == null)
+        if (pattern == null)
             throw new IllegalArgumentException("Given item does not encode a processing pattern: " + definition);
 
         AmadronOffer offer = AmadronOfferManager.getInstance().getOffer(pattern.offerId());
-        if(offer == null)
+        if (offer == null)
             throw new IllegalArgumentException("Given item does not have an offer: " + definition);
 
         this.offerId = offer.getOfferId();
         ItemStack mayInputStackItem = offer.getInput().getItem();
         FluidStack mayInputStackFluid = offer.getInput().getFluid();
         GenericStack input = mayInputStackItem.isEmpty() ? GenericStack.fromFluidStack(mayInputStackFluid) : GenericStack.fromItemStack(mayInputStackItem);
-        inputs = new Input[] { new Input(input) };
+        inputs = new Input[]{new Input(input)};
 
         ItemStack mayOutputStackItem = offer.getOutput().getItem();
         FluidStack mayOutputStackFluid = offer.getOutput().getFluid();
@@ -80,7 +80,7 @@ public class AmadronPatternDetails implements IPatternDetails
 
     public static void encode(ItemStack stack, ResourceLocation offerId)
     {
-        if(AmadronOfferManager.getInstance().getOffer(offerId) != null)
+        if (AmadronOfferManager.getInstance().getOffer(offerId) != null)
         {
             stack.set(APDataComponents.AMADRON_PATTERN, new EncodedAmadronPattern(offerId));
         }
@@ -103,16 +103,16 @@ public class AmadronPatternDetails implements IPatternDetails
 
     private static void addTooltipFromAmadronResource(PatternDetailsTooltip tooltip, AmadronTradeResource resource, boolean toInput)
     {
-        if(!resource.getItem().isEmpty())
+        if (!resource.getItem().isEmpty())
         {
-            if(toInput)
+            if (toInput)
                 tooltip.addInput(AEItemKey.of(resource.getItem()), resource.getAmount());
             else
                 tooltip.addOutput(AEItemKey.of(resource.getItem()), resource.getAmount());
         }
-        else if(!resource.getFluid().isEmpty())
+        else if (!resource.getFluid().isEmpty())
         {
-            if(toInput)
+            if (toInput)
                 tooltip.addInput(AEFluidKey.of(resource.getFluid()), resource.getAmount());
             else
                 tooltip.addOutput(AEFluidKey.of(resource.getFluid()), resource.getAmount());
@@ -120,15 +120,16 @@ public class AmadronPatternDetails implements IPatternDetails
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return definition.hashCode();
     }
 
     @Override
     public boolean equals(Object obj)
     {
-        if(obj == this) return true;
-        if(obj instanceof AmadronPatternDetails patternDetails)
+        if (obj == this) return true;
+        if (obj instanceof AmadronPatternDetails patternDetails)
         {
             return definition.equals(patternDetails.definition);
         }
@@ -140,29 +141,34 @@ public class AmadronPatternDetails implements IPatternDetails
         private final GenericStack[] template;
         private final long multiplier;
 
-        private Input(GenericStack stack) {
-            this.template = new GenericStack[] { new GenericStack(stack.what(), 1) };
+        private Input(GenericStack stack)
+        {
+            this.template = new GenericStack[]{new GenericStack(stack.what(), 1)};
             this.multiplier = stack.amount();
         }
 
         @Override
-        public GenericStack[] getPossibleInputs() {
+        public GenericStack[] getPossibleInputs()
+        {
             return template;
         }
 
         @Override
-        public long getMultiplier() {
+        public long getMultiplier()
+        {
             return multiplier;
         }
 
         @Override
-        public boolean isValid(AEKey input, Level level) {
+        public boolean isValid(AEKey input, Level level)
+        {
             return input.matches(template[0]);
         }
 
         @Nullable
         @Override
-        public AEKey getRemainingKey(AEKey template) {
+        public AEKey getRemainingKey(AEKey template)
+        {
             return null;
         }
     }

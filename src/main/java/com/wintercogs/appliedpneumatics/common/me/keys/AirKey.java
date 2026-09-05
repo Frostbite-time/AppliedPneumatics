@@ -22,14 +22,16 @@ import java.util.List;
  */
 public class AirKey extends AEKey
 {
-    private static final ResourceLocation ID = ResourceLocation.tryBuild(AppliedPneumatics.MODID,"air_key");
+    private static final ResourceLocation ID = ResourceLocation.tryBuild(AppliedPneumatics.MODID, "air_key");
 
     public static final AirKey INSTANCE = new AirKey();
     // 没有实际数据要存储，AE会在外部帮忙写入类型
     public static final MapCodec<AirKey> MAP_CODEC = MapCodec.unit(() -> INSTANCE);
     public static final Codec<AirKey> CODEC = MAP_CODEC.codec();
 
-    private AirKey() {}
+    private AirKey()
+    {
+    }
 
     @Override
     public AEKeyType getType()
@@ -65,7 +67,9 @@ public class AirKey extends AEKey
 
     // 无内部数据
     @Override
-    public void writeToPacket(RegistryFriendlyByteBuf data) {}
+    public void writeToPacket(RegistryFriendlyByteBuf data)
+    {
+    }
 
     @Override
     protected Component computeDisplayName()
@@ -75,7 +79,9 @@ public class AirKey extends AEKey
 
     // 无掉落物
     @Override
-    public void addDrops(long amount, List<ItemStack> drops, Level level, BlockPos pos) {}
+    public void addDrops(long amount, List<ItemStack> drops, Level level, BlockPos pos)
+    {
+    }
 
     @Override
     public boolean hasComponents()

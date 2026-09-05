@@ -64,27 +64,29 @@ public class APDelayedBreaker
      * 如果能取出任一一个不合要求的元件就弹出
      * 否则就破坏方块
      */
-    public static void ejectOrBreak(Level level, BlockPos pos) {
-        if (!(level instanceof ServerLevel server)) {
+    public static void ejectOrBreak(Level level, BlockPos pos)
+    {
+        if (!(level instanceof ServerLevel server))
+        {
             return; // 只在服务端跑
         }
         boolean didAnything = false;
         // 走能力系统尝试找元件
         IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
-        if(itemHandler != null)
+        if (itemHandler != null)
         {
-            for(int i = 0; i < itemHandler.getSlots(); i++)
+            for (int i = 0; i < itemHandler.getSlots(); i++)
             {
                 ItemStack stack = itemHandler.getStackInSlot(i);
-                if(stack.isEmpty()) continue;
-                if(stack.getItem() instanceof IAirStorageCell cell)
+                if (stack.isEmpty()) continue;
+                if (stack.getItem() instanceof IAirStorageCell cell)
                 {
                     // 剩余容量小于等于0，且没有安装安全卡或者真空卡
-                    if(IAirStorageCell.remainingAmount(cell.getTotalBytes(), stack.getOrDefault(APDataComponents.AIR_STORED, 0L)) <= 0
-                    && !cell.getUpgrades(stack).isInstalled(APItems.SECURITY_CARD) && !cell.getUpgrades(stack).isInstalled(APItems.VACUUM_CARD))
+                    if (IAirStorageCell.remainingAmount(cell.getTotalBytes(), stack.getOrDefault(APDataComponents.AIR_STORED, 0L)) <= 0
+                            && !cell.getUpgrades(stack).isInstalled(APItems.SECURITY_CARD) && !cell.getUpgrades(stack).isInstalled(APItems.VACUUM_CARD))
                     {
                         ItemStack extracted = itemHandler.extractItem(i, 1, false);
-                        if(!extracted.isEmpty())
+                        if (!extracted.isEmpty())
                         {
                             // 掉落物生成
                             ItemEntity drop = new ItemEntity(level,
@@ -103,15 +105,18 @@ public class APDelayedBreaker
             }
         }
         // 如果没有成功取出任何元件，则破坏当前方块
-        if(!didAnything)
+        if (!didAnything)
         {
             level.destroyBlock(pos, true);
             spawnLeakBurst(server, pos);
         }
     }
 
-    /** 统一的“漏气”效果：服务端广播到附近玩家 */
-    private static void spawnLeakBurst(ServerLevel server, BlockPos pos) {
+    /**
+     * 统一的“漏气”效果：服务端广播到附近玩家
+     */
+    private static void spawnLeakBurst(ServerLevel server, BlockPos pos)
+    {
         // 粒子中心与参数
         double cx = pos.getX() + 0.5;
         double cy = pos.getY() + 1.1; // 稍微偏上，避免被遮挡

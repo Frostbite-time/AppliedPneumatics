@@ -18,7 +18,7 @@ public class AirCellHandler implements ICellHandler
     @Override
     public @Nullable StorageCell getCellInventory(ItemStack is, @Nullable ISaveProvider host)
     {
-        if(is.getItem() instanceof IAirStorageCell cell)
+        if (is.getItem() instanceof IAirStorageCell cell)
         {
             return new AirCellInventory(is, cell, host);
         }

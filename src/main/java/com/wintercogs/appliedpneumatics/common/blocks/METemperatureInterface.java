@@ -35,10 +35,10 @@ public class METemperatureInterface extends AEBaseEntityBlock<METemperatureInter
     @Override
     protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hitResult)
     {
-        super.useWithoutItem(state,level,pos,player,hitResult);
-        if(!level.isClientSide()&&!player.isShiftKeyDown())
+        super.useWithoutItem(state, level, pos, player, hitResult);
+        if (!level.isClientSide() && !player.isShiftKeyDown())
         {
-            if(level.getBlockEntity(pos) instanceof METemperatureInterfaceBlockEntity be)
+            if (level.getBlockEntity(pos) instanceof METemperatureInterfaceBlockEntity be)
                 MenuOpener.open(APMenus.ME_TEMPERATURE_INTERFACE_MENU.get(), player, MenuLocators.forBlockEntity(be));
         }
         return InteractionResult.SUCCESS_NO_ITEM_USED;

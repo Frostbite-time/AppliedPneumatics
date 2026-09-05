@@ -56,6 +56,7 @@ public class ModItemModelProvider extends ItemModelProvider
 
     /**
      * 生成便携气体单元的模型
+     *
      * @param item    物品
      * @param housing layer0 纹理（通常用你自己的）
      * @param side    layer3 纹理（可能来自 ae2/megacells）
@@ -73,7 +74,8 @@ public class ModItemModelProvider extends ItemModelProvider
                 .texture("layer3", side);
     }
 
-    private String getItemName(ItemLike item) {
+    private String getItemName(ItemLike item)
+    {
         return BuiltInRegistries.ITEM.getKey(item.asItem()).getPath();
     }
 

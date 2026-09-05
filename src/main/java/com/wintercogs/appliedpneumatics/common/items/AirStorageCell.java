@@ -60,10 +60,11 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
                                 @NotNull List<Component> lines,
                                 @NotNull TooltipFlag advancedTooltips)
     {
-        if (Platform.isClient()) {
+        if (Platform.isClient())
+        {
             // 基础容量/使用
             long stored = IAirStorageCell.getStoredAir(stack);
-            long used   = IAirStorageCell.usedBytes(stored);
+            long used = IAirStorageCell.usedBytes(stored);
             lines.add(Tooltips.bytesUsed(used, getTotalBytes()));
             // 单类型：0 或 1
             int typesUsed = stored > 0 ? 1 : 0;
@@ -84,9 +85,11 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
         // 内容预览（只有 Air 一种）
         List<GenericStack> content = Collections.emptyList();
         boolean hasMore = false;
-        if (showCnt) {
+        if (showCnt)
+        {
             long stored = IAirStorageCell.getStoredAir(stack);
-            if (stored > 0) {
+            if (stored > 0)
+            {
                 content = List.of(new GenericStack(AirKey.INSTANCE, stored));
             }
         }
@@ -120,41 +123,51 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
     {
         return FuzzyMode.IGNORE_ALL;
     }
+
     @Override
-    public void setFuzzyMode(ItemStack is, FuzzyMode fzMode) {}
+    public void setFuzzyMode(ItemStack is, FuzzyMode fzMode)
+    {
+    }
 
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand)
+    {
         this.disassembleDrive(player.getItemInHand(hand), level, player);
         return new InteractionResultHolder<>(InteractionResult.sidedSuccess(level.isClientSide()),
                 player.getItemInHand(hand));
     }
 
-    private boolean disassembleDrive(ItemStack stack, Level level, Player player) {
-        if (!InteractionUtil.isInAlternateUseMode(player)) {
+    private boolean disassembleDrive(ItemStack stack, Level level, Player player)
+    {
+        if (!InteractionUtil.isInAlternateUseMode(player))
+        {
             return false;
         }
 
         var disassembledStacks = StorageCellDisassemblyRecipe.getDisassemblyResult(level, stack.getItem());
-        if (disassembledStacks.isEmpty()) {
+        if (disassembledStacks.isEmpty())
+        {
             return false;
         }
 
         var playerInventory = player.getInventory();
-        if (playerInventory.getSelected() != stack) {
+        if (playerInventory.getSelected() != stack)
+        {
             return false;
         }
 
         var inv = StorageCells.getCellInventory(stack, null);
-        if (inv != null && !inv.getAvailableStacks().isEmpty()) {
+        if (inv != null && !inv.getAvailableStacks().isEmpty())
+        {
             player.displayClientMessage(PlayerMessages.OnlyEmptyCellsCanBeDisassembled.text(), true);
             return false;
         }
 
         playerInventory.setItem(playerInventory.selected, ItemStack.EMPTY);
 
-        for (var disassembledStack : disassembledStacks) {
+        for (var disassembledStack : disassembledStacks)
+        {
             playerInventory.placeItemBackInInventory(disassembledStack.copy());
         }
 

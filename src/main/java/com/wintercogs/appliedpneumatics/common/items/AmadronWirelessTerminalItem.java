@@ -83,14 +83,14 @@ public class AmadronWirelessTerminalItem extends WirelessTerminalItem implements
             AmadronWirelessTerminalMenuHost menuHost = getMenuHost(player, locator, null);
 
             // 无能量拒绝打开
-            if(getAECurrentPower(locator.locateItem(player)) <= 0)
+            if (getAECurrentPower(locator.locateItem(player)) <= 0)
             {
                 player.sendSystemMessage(GuiText.OutOfPower.text());
                 return new InteractionResultHolder<>(InteractionResult.PASS, is);
             }
 
             // 未链接拒绝打开
-            if(!menuHost.getLinkStatus().connected())
+            if (!menuHost.getLinkStatus().connected())
             {
                 player.sendSystemMessage(PlayerMessages.LinkedNetworkNotFound.text());
                 return new InteractionResultHolder<>(InteractionResult.PASS, is);
@@ -119,7 +119,7 @@ public class AmadronWirelessTerminalItem extends WirelessTerminalItem implements
         {
             ItemStack tabletStack = player.getItemInHand(context.getHand());
             GlobalPos globalPos = GlobalPos.of(level.dimension(), pos);
-            if(!level.isClientSide())
+            if (!level.isClientSide())
             {
                 toggleLinkToAmadronProcess(tabletStack, globalPos);
             }
@@ -128,7 +128,9 @@ public class AmadronWirelessTerminalItem extends WirelessTerminalItem implements
                 player.playSound(ModSounds.CHIRP.get(), 1.0F, 1.5F);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
-        } else {
+        }
+        else
+        {
             return InteractionResult.PASS;
         }
     }
@@ -141,7 +143,7 @@ public class AmadronWirelessTerminalItem extends WirelessTerminalItem implements
         super.appendHoverText(stack, context, lines, advancedTooltips);
 
         GlobalPos amadronStationPos = getLinkedAmadronPos(stack);
-        if(amadronStationPos == null)
+        if (amadronStationPos == null)
         {
             lines.add(Component.translatable("tooltip.appliedpneumatics.item.amadron.unlink")
                     .withStyle(ChatFormatting.RED));
@@ -174,7 +176,7 @@ public class AmadronWirelessTerminalItem extends WirelessTerminalItem implements
     // 快速绑定、取消绑定方块
     private static void toggleLinkToAmadronProcess(ItemStack stack, GlobalPos pos)
     {
-        if(stack.has(APDataComponents.AMADRON_PROCESS_POS) && Objects.equals(stack.get(APDataComponents.AMADRON_PROCESS_POS), pos))
+        if (stack.has(APDataComponents.AMADRON_PROCESS_POS) && Objects.equals(stack.get(APDataComponents.AMADRON_PROCESS_POS), pos))
         {
             stack.remove(APDataComponents.AMADRON_PROCESS_POS);
         }
@@ -194,24 +196,28 @@ public class AmadronWirelessTerminalItem extends WirelessTerminalItem implements
     public static @Nullable MEAmadronProcessStationBlockEntity getLinkWithAmadronProcess(ItemStack stack, Level level)
     {
         // 客户端不处理，直接返回 null
-        if (level.isClientSide) {
+        if (level.isClientSide)
+        {
             return null;
         }
 
         // 没有绑定则直接返回 null
         GlobalPos pos = stack.get(APDataComponents.AMADRON_PROCESS_POS);
-        if (pos == null) {
+        if (pos == null)
+        {
             return null;
         }
 
         // 根据 GlobalPos 找对应的服务器维度
         ServerLevel serverLevel = level.getServer() != null ? level.getServer().getLevel(pos.dimension()) : null;
-        if (serverLevel == null) {
+        if (serverLevel == null)
+        {
             return null;
         }
 
         BlockEntity be = serverLevel.getBlockEntity(pos.pos());
-        if (be instanceof MEAmadronProcessStationBlockEntity station) {
+        if (be instanceof MEAmadronProcessStationBlockEntity station)
+        {
             return station;
         }
         return null;
@@ -221,7 +227,7 @@ public class AmadronWirelessTerminalItem extends WirelessTerminalItem implements
     public @NotNull List<BlockPos> getStoredPositions(UUID player, @NotNull ItemStack itemStack)
     {
         GlobalPos amadronPos = getLinkedAmadronPos(itemStack);
-        if(amadronPos != null)
+        if (amadronPos != null)
         {
             return List.of(amadronPos.pos());
         }

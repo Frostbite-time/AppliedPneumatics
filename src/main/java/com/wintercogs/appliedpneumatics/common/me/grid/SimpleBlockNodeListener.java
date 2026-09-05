@@ -17,8 +17,8 @@ public class SimpleBlockNodeListener implements IGridNodeListener<BlockEntity>
 
     @Override
     public void onStateChanged(BlockEntity owner,
-        IGridNode node,
-        IGridNodeListener.State state)
+                               IGridNode node,
+                               IGridNodeListener.State state)
     {
         if (owner.getLevel() instanceof ServerLevel sl)
         {

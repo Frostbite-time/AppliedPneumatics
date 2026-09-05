@@ -20,13 +20,13 @@ public class APDataComponents
 
 
     // 存储元件中空气数量
-    public static final DeferredHolder<DataComponentType<?>,DataComponentType<Long>> AIR_STORED = register(
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> AIR_STORED = register(
             "air_stored", builder -> builder.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG)
     );
 
     // 存储一个亚马龙处理站的位置
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<GlobalPos>> AMADRON_PROCESS_POS = register(
-      "amadron_process_pos", builder -> builder.persistent(GlobalPos.CODEC).networkSynchronized(GlobalPos.STREAM_CODEC)
+            "amadron_process_pos", builder -> builder.persistent(GlobalPos.CODEC).networkSynchronized(GlobalPos.STREAM_CODEC)
     );
 
     // 存储一个物品列表
@@ -49,11 +49,13 @@ public class APDataComponents
     );
 
 
-    private static <T> DeferredHolder<DataComponentType<?>,DataComponentType<T>> register(String name, UnaryOperator<DataComponentType.Builder<T>> builder) {
-        return DATA_COMPONENTS.register(name,()->  builder.apply(DataComponentType.builder()).build());
+    private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(String name, UnaryOperator<DataComponentType.Builder<T>> builder)
+    {
+        return DATA_COMPONENTS.register(name, () -> builder.apply(DataComponentType.builder()).build());
     }
 
-    public static void register(IEventBus eventBus){
+    public static void register(IEventBus eventBus)
+    {
         DATA_COMPONENTS.register(eventBus);
     }
 }

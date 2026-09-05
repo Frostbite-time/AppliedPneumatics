@@ -40,7 +40,7 @@ public class AppliedPneumatics
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
         modEventBus.addListener((RegisterEvent event) -> {
-            if(event.getRegistryKey().equals(Registries.BLOCK))
+            if (event.getRegistryKey().equals(Registries.BLOCK))
                 AEPlugin.init();
         });
 
@@ -54,11 +54,11 @@ public class AppliedPneumatics
 
     private void constructMod(final FMLConstructModEvent event)
     {
-        if(ModList.get().isLoaded(MEGA_CELL_MODID))
+        if (ModList.get().isLoaded(MEGA_CELL_MODID))
         {
             MEGA_CELL_LOADED = true;
         }
-        if(ModList.get().isLoaded(EAE_MODID))
+        if (ModList.get().isLoaded(EAE_MODID))
         {
             EAE_LOADED = true;
         }

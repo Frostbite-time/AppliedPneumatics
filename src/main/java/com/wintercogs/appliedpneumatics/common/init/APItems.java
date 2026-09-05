@@ -45,7 +45,7 @@ public class APItems
             () -> new AirStorageCell(new Item.Properties().stacksTo(1),
                     0.5f, // 待机能耗
                     1 // 总字节数量（单位：千）
-                    ));
+            ));
 
     public static final DeferredItem<AirStorageCell> AIR_CELL_4K = registerCell("air_cell_4k",
             () -> new AirStorageCell(new Item.Properties().stacksTo(1),
@@ -197,7 +197,7 @@ public class APItems
 
     // 亚马龙无线终端
     public static final DeferredItem<AmadronWirelessTerminalItem> AMADRON_WIRELESS_TERMINAL = ITEMS.register("amadron_wireless_terminal",
-            () -> new AmadronWirelessTerminalItem(AEConfig.instance().getWirelessTerminalBattery(),new Item.Properties().stacksTo(1)));
+            () -> new AmadronWirelessTerminalItem(AEConfig.instance().getWirelessTerminalBattery(), new Item.Properties().stacksTo(1)));
 
     // 亚马龙样板
     public static final DeferredItem<Item> AMADRON_PATTERN = ITEMS.register("amadron_pattern",

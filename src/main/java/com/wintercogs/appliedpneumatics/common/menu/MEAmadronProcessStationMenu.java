@@ -19,7 +19,8 @@ public class MEAmadronProcessStationMenu extends UpgradeableMenu<MEAmadronProces
 {
     private static String cancelAllJobsAction = "cancel_all_jobs";
 
-    @GuiSync(10) public int latestJobs = 0;
+    @GuiSync(10)
+    public int latestJobs = 0;
 
     // 双端构造，AE自动传递host
     public MEAmadronProcessStationMenu(int id, Inventory playerInv, @NotNull MEAmadronProcessStationBlockEntity host)
@@ -31,7 +32,7 @@ public class MEAmadronProcessStationMenu extends UpgradeableMenu<MEAmadronProces
     private void onJobCancel()
     {
         MEAmadronProcessStationBlockEntity be = getBlockEntity();
-        if(be != null)
+        if (be != null)
             be.cancelAllJobs(Component.translatable("amadron.appliedpneumatics.process_fail.order_cancel", be.getBlockPos().toShortString()));
     }
 
@@ -42,9 +43,9 @@ public class MEAmadronProcessStationMenu extends UpgradeableMenu<MEAmadronProces
 
     public String getScreenStyle()
     {
-        if(getBlockEntity() != null)
+        if (getBlockEntity() != null)
         {
-            if(getBlockEntity().getTerminalPatternInventory().size() > 9)
+            if (getBlockEntity().getTerminalPatternInventory().size() > 9)
                 return MEAmadronProcessStationGUI.EXTENDED;
             else
                 return MEAmadronProcessStationGUI.COMMON;
@@ -57,21 +58,21 @@ public class MEAmadronProcessStationMenu extends UpgradeableMenu<MEAmadronProces
     @Override
     protected void setupInventorySlots()
     {
-        if(getBlockEntity() == null) return;
+        if (getBlockEntity() == null) return;
 
-        for(int i = 0; i<getBlockEntity().getTerminalPatternInventory().size(); i++)
+        for (int i = 0; i < getBlockEntity().getTerminalPatternInventory().size(); i++)
         {
             AppEngSlot slot = new AppEngSlot(getHost().getTerminalPatternInventory(), i);
             this.addSlot(slot, SlotSemantics.ENCODED_PATTERN);
         }
         ConfigMenuInventory inputWrapper = getBlockEntity().getInputInv().createMenuWrapper();
-        for(int i = 0; i<inputWrapper.size(); i++)
+        for (int i = 0; i < inputWrapper.size(); i++)
         {
             AppEngSlot slot = new AppEngSlot(inputWrapper, i);
             this.addSlot(slot, SlotSemantics.MACHINE_INPUT);
         }
         ConfigMenuInventory outputWrapper = getBlockEntity().getOutputInv().createMenuWrapper();
-        for(int i = 0; i<outputWrapper.size(); i++)
+        for (int i = 0; i < outputWrapper.size(); i++)
         {
             AppEngSlot slot = new AppEngSlot(outputWrapper, i)
             {

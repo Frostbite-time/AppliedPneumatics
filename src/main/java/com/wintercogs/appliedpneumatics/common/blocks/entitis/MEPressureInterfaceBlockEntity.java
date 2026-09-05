@@ -14,9 +14,9 @@ import appeng.api.upgrades.IUpgradeableObject;
 import appeng.api.upgrades.UpgradeInventories;
 import appeng.blockentity.ServerTickingBlockEntity;
 import appeng.blockentity.grid.AENetworkedBlockEntity;
+import appeng.util.SettingsFrom;
 import appeng.util.inv.AppEngInternalInventory;
 import appeng.util.inv.filter.IAEItemFilter;
-import appeng.util.SettingsFrom;
 import com.wintercogs.appliedpneumatics.common.init.APBlockEntities;
 import com.wintercogs.appliedpneumatics.common.init.APBlocks;
 import com.wintercogs.appliedpneumatics.common.init.APDataComponents;
@@ -51,8 +51,10 @@ public class MEPressureInterfaceBlockEntity extends AENetworkedBlockEntity imple
         IUpgradeableObject, ServerTickingBlockEntity
 {
 
-    /** 与ME系统每交互1ml空气消耗1.25AE能量，期望气压非负时，此消耗为十分之一。
-     * 这是为了保证使用其产生压缩气体时，能耗为满配通量压缩机的一半左右 */
+    /**
+     * 与ME系统每交互1ml空气消耗1.25AE能量，期望气压非负时，此消耗为十分之一。
+     * 这是为了保证使用其产生压缩气体时，能耗为满配通量压缩机的一半左右
+     */
     private static final double AE_ENERGY_COST_PER_ML = 1.25;
 
     // 升级卡仓 5卡槽 包含四个容量卡和一个真空卡
@@ -132,7 +134,7 @@ public class MEPressureInterfaceBlockEntity extends AENetworkedBlockEntity imple
 
     public int getMaxVolume()
     {
-        return (int) (getVolume() * (double)airHandler.getDangerPressure());
+        return (int) (getVolume() * (double) airHandler.getDangerPressure());
     }
 
     public float getExpectedPressure()
@@ -214,7 +216,7 @@ public class MEPressureInterfaceBlockEntity extends AENetworkedBlockEntity imple
     {
         super.saveAdditional(tag, registries);
         tag.put("air_handler", airHandler.serializeNBT());
-        this.inventory.writeToNBT(tag,"inv", registries);
+        this.inventory.writeToNBT(tag, "inv", registries);
         tag.putFloat("expected_pressure", expectedPressure);
         this.upgrades.writeToNBT(tag, "interface_upgrades", registries);
     }
@@ -228,7 +230,7 @@ public class MEPressureInterfaceBlockEntity extends AENetworkedBlockEntity imple
         interactWithMESystem(this.level, worldPosition, getBlockState(), this); // 重设升级卡后立刻与ME系统进行一次交互
 
         // 立刻重新设置有关安全卡的效果
-        if(getUpgrades().isInstalled(APItems.SECURITY_CARD))
+        if (getUpgrades().isInstalled(APItems.SECURITY_CARD))
             airHandler.enableSafetyVenting(p -> p >= 20, Direction.UP);
         else
             airHandler.disableSafetyVenting();
@@ -242,15 +244,16 @@ public class MEPressureInterfaceBlockEntity extends AENetworkedBlockEntity imple
         if (level == null || level.isClientSide) return;
 
         // 与ME系统进行一次气体交换
-        if(getMainNode().isActive())
-            interactWithMESystem(level, worldPosition, getBlockState() ,this);
+        if (getMainNode().isActive())
+            interactWithMESystem(level, worldPosition, getBlockState(), this);
 
         // 内部物品槽交互
         ItemStack containerItem = this.inventory.getStackInSlot(0);
-        if(!containerItem.isEmpty())
+        if (!containerItem.isEmpty())
         {
             IAirHandler itemAirHandler = containerItem.getCapability(PNCCapabilities.AIR_HANDLER_ITEM);
-            if (itemAirHandler != null) {
+            if (itemAirHandler != null)
+            {
                 float bePressure = this.airHandler.getPressure();
                 float itemPressure = itemAirHandler.getPressure();
                 float itemVolume = itemAirHandler.getVolume();
@@ -305,7 +308,7 @@ public class MEPressureInterfaceBlockEntity extends AENetworkedBlockEntity imple
 
         // airHandler的回调很难覆盖所有路径
         // 这里直接使用tick比较，2个int比较极其轻量
-        if(this.lastAir != this.airHandler.getAir())
+        if (this.lastAir != this.airHandler.getAir())
         {
             this.lastAir = this.airHandler.getAir();
             this.setChanged();
@@ -337,10 +340,13 @@ public class MEPressureInterfaceBlockEntity extends AENetworkedBlockEntity imple
         // 预估存储侧的可行量
         final IActionSource src = IActionSource.ofMachine(be);
         final int byStorage;
-        if (wantedAir > 0) {
+        if (wantedAir > 0)
+        {
             // ME -> 接口
             byStorage = (int) storage.extract(AirKey.INSTANCE, demand, Actionable.SIMULATE, src);
-        } else {
+        }
+        else
+        {
             // 接口 -> ME
             byStorage = (int) storage.insert(AirKey.INSTANCE, demand, Actionable.SIMULATE, src);
         }
@@ -361,32 +367,37 @@ public class MEPressureInterfaceBlockEntity extends AENetworkedBlockEntity imple
         if (moveByEnergy <= 0) return;
 
         // 最终执行
-        if (wantedAir > 0) {
+        if (wantedAir > 0)
+        {
             // ME -> 接口
             final int extracted = (int) storage.extract(AirKey.INSTANCE, moveByEnergy, Actionable.MODULATE, src);
             if (extracted > 0) be.airHandler.addAir(extracted);
-        } else {
+        }
+        else
+        {
             // 接口 -> ME
             final int inserted = (int) storage.insert(AirKey.INSTANCE, moveByEnergy, Actionable.MODULATE, src);
             if (inserted > 0) be.airHandler.addAir(-inserted);
         }
     }
 
-    /** 由AEBasebBlock调用，把需要掉落的item放进列表即可，这里也能处理一些其他方块中onRemove时需要的操作 */
+    /**
+     * 由AEBasebBlock调用，把需要掉落的item放进列表即可，这里也能处理一些其他方块中onRemove时需要的操作
+     */
     @Override
     public void addAdditionalDrops(Level level, BlockPos pos, List<ItemStack> drops)
     {
         super.addAdditionalDrops(level, pos, drops);
-        for(int i = 0; i < inventory.size(); i++)
+        for (int i = 0; i < inventory.size(); i++)
         {
             ItemStack slotContent = inventory.getStackInSlot(i);
-            if(slotContent.isEmpty()) continue;
+            if (slotContent.isEmpty()) continue;
             drops.add(slotContent.copy());
         }
-        for(int i = 0; i < upgrades.size(); i++)
+        for (int i = 0; i < upgrades.size(); i++)
         {
             ItemStack slotContent = upgrades.getStackInSlot(i);
-            if(slotContent.isEmpty()) continue;
+            if (slotContent.isEmpty()) continue;
             drops.add(slotContent.copy());
         }
     }

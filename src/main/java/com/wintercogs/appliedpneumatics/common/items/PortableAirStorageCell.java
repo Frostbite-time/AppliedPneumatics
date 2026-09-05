@@ -148,10 +148,11 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
     {
         if (tintIndex == 1) //led
         {
-            if(stack.getItem() instanceof PoweredContainerItem poweredContainer)
+            if (stack.getItem() instanceof PoweredContainerItem poweredContainer)
             {
-                if(poweredContainer.getAECurrentPower(stack) <= 0)
-                    return CellState.ABSENT.getStateColor();;
+                if (poweredContainer.getAECurrentPower(stack) <= 0)
+                    return CellState.ABSENT.getStateColor();
+                ;
             }
             long stored = IAirStorageCell.getStoredAir(stack);
             CellState state = IAirStorageCell.calcState(((IAirStorageCell) stack.getItem()).getTotalBytes(), stored);
@@ -185,13 +186,13 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
         {
             // 基础容量/使用
             long stored = IAirStorageCell.getStoredAir(stack);
-            long used   = IAirStorageCell.usedBytes(stored);
+            long used = IAirStorageCell.usedBytes(stored);
             lines.add(Tooltips.bytesUsed(used, getTotalBytes()));
             // 单类型：0 或 1
             int typesUsed = stored > 0 ? 1 : 0;
             lines.add(Tooltips.typesUsed(typesUsed, 1));
             IAirHandler handler = stack.getCapability(PNCCapabilities.AIR_HANDLER_ITEM);
-            if(handler != null)
+            if (handler != null)
                 lines.add(Component.translatable("appliedpneumatics.portable_air_cell.bar", String.format(Locale.ROOT, "%.1f", handler.getPressure())).withStyle(ChatFormatting.DARK_GREEN));
         }
     }
@@ -209,9 +210,11 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
         // 内容预览（只有 Air 一种）
         List<GenericStack> content = Collections.emptyList();
         boolean hasMore = false;
-        if (showCnt) {
+        if (showCnt)
+        {
             long stored = IAirStorageCell.getStoredAir(stack);
-            if (stored > 0) {
+            if (stored > 0)
+            {
                 content = List.of(new GenericStack(AirKey.INSTANCE, stored));
             }
         }
@@ -246,7 +249,9 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
     }
 
     @Override
-    public void setFuzzyMode(ItemStack is, FuzzyMode fzMode) {}
+    public void setFuzzyMode(ItemStack is, FuzzyMode fzMode)
+    {
+    }
 
     @Override
     public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slotId, boolean isSelected)
@@ -264,7 +269,7 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
         if (src == null) return;
 
         final float DEAD_BAND_BAR = 0.05f;     // 压差死区，防抖
-        final int   BASE_AIR_PER_TICK = 20000;  // 基础每 tick 最大传输空气量（单位：air）
+        final int BASE_AIR_PER_TICK = 20000;  // 基础每 tick 最大传输空气量（单位：air）
         final double AE_PER_AIR = 0.02d;       // 每 1 air 消耗的 AE 能量
 
         // 逐个物品尝试充气：主物品栏 + 盔甲栏 + 副手
@@ -272,6 +277,7 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
         Iterable<ItemStack> loops = () -> new Iterator<>()
         {
             final List<ItemStack> all = new ArrayList<>();
+
             {   // 主物品栏
                 all.addAll(player.getInventory().items);
                 // 盔甲栏
@@ -279,9 +285,20 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
                 // 副手
                 all.addAll(player.getInventory().offhand);
             }
+
             int idx = 0;
-            @Override public boolean hasNext() { return idx < all.size(); }
-            @Override public ItemStack next()  { return all.get(idx++); }
+
+            @Override
+            public boolean hasNext()
+            {
+                return idx < all.size();
+            }
+
+            @Override
+            public ItemStack next()
+            {
+                return all.get(idx++);
+            }
         };
 
         for (ItemStack other : loops)
@@ -302,7 +319,7 @@ public class PortableAirStorageCell extends AbstractPortableCell implements IAir
             // 目标可用空间 maxAir - currentAir
             int dstMaxAir = (int) (dst.maxPressure() * dst.getVolume());
             int dstAir = dst.getAir();
-            int dstFreeAir  = Math.max(0, dstMaxAir - dstAir);
+            int dstFreeAir = Math.max(0, dstMaxAir - dstAir);
             if (dstFreeAir <= 0) continue;
 
             // 源可用空气

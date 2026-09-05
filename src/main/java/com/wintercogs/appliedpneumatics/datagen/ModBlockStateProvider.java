@@ -44,15 +44,17 @@ public class ModBlockStateProvider extends BlockStateProvider
      * - blockstates/<id>.json（每个取值一个 variant）
      * - models/block/<id>/<state>.json（cube_all）
      * - models/item/<id>.json（指向默认状态对应的 block 模型）
-     *
+     * <p>
      * 贴图路径：textures/block/<id>/<state>.png
      */
     public <E extends Enum<E> & StringRepresentable>
-    void cubeAllPerState(DeferredBlock<? extends Block> defBlock, EnumProperty<E> prop) {
+    void cubeAllPerState(DeferredBlock<? extends Block> defBlock, EnumProperty<E> prop)
+    {
         Block block = defBlock.get();
 
         var def = block.getStateDefinition();
-        if (!def.getProperties().contains(prop)) {
+        if (!def.getProperties().contains(prop))
+        {
             throw new IllegalArgumentException("Block " + block + " does not contain property " + prop.getName());
         }
 
@@ -62,9 +64,10 @@ public class ModBlockStateProvider extends BlockStateProvider
         E defaultVal = block.defaultBlockState().getValue(prop);
         ModelFile defaultModel = null;
 
-        for (E value : prop.getPossibleValues()) {
+        for (E value : prop.getPossibleValues())
+        {
             String state = value.getSerializedName();
-            String name  = id.getPath() + "/" + state; // 模型 ID（注意：不带 "block/" 前缀）
+            String name = id.getPath() + "/" + state; // 模型 ID（注意：不带 "block/" 前缀）
             // 方块模型：models/block/<name>.json，纹理：textures/block/<name>.png
             ModelFile model = models().cubeAll(name, modLoc("block/" + name));
 

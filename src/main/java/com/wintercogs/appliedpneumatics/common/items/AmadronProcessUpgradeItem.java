@@ -28,7 +28,7 @@ public class AmadronProcessUpgradeItem extends Item
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context)
     {
-        if(context.getLevel().isClientSide())
+        if (context.getLevel().isClientSide())
             return InteractionResult.PASS;
         else
         {
@@ -37,12 +37,12 @@ public class AmadronProcessUpgradeItem extends Item
             BlockEntity blockEntity = level.getBlockEntity(pos);
             Player player = context.getPlayer();
 
-            if(player == null) return InteractionResult.PASS;
-            if(!(blockEntity instanceof MEAmadronProcessStationBlockEntity be)) return InteractionResult.PASS;
+            if (player == null) return InteractionResult.PASS;
+            if (!(blockEntity instanceof MEAmadronProcessStationBlockEntity be)) return InteractionResult.PASS;
 
-            if(be.getBlockState().getBlock() == APBlocks.ME_AMADRON_PROCESS_STATION.get())
+            if (be.getBlockState().getBlock() == APBlocks.ME_AMADRON_PROCESS_STATION.get())
             {
-                if(be.getJobAmount() > 0 || !be.getInputInv().isEmpty() || !be.getOutputInv().isEmpty())
+                if (be.getJobAmount() > 0 || !be.getInputInv().isEmpty() || !be.getOutputInv().isEmpty())
                 {
                     player.sendSystemMessage(Component.translatable("tooltip.appliedpneumatics.amadron_upgrade.amadron_process_busy"));
                     return InteractionResult.PASS;
@@ -51,7 +51,7 @@ public class AmadronProcessUpgradeItem extends Item
                 // 收集样板
                 InternalInventory patternInv = be.getTerminalPatternInventory();
                 List<ItemStack> patterns = new ArrayList<>(patternInv.size());
-                for(int i = 0; i < patternInv.size(); i++)
+                for (int i = 0; i < patternInv.size(); i++)
                 {
                     patterns.add(i, patternInv.getStackInSlot(i).copy());
                 }
@@ -60,12 +60,12 @@ public class AmadronProcessUpgradeItem extends Item
 
                 level.setBlockAndUpdate(pos, APBlocks.ME_AMADRON_EXTENDED_PROCESS_STATION.get().defaultBlockState());
                 BlockEntity newBlockEntity = level.getBlockEntity(pos);
-                if(newBlockEntity instanceof MEAmadronProcessStationBlockEntity newBE)
+                if (newBlockEntity instanceof MEAmadronProcessStationBlockEntity newBE)
                 {
-                    for(int i = 0; i < patterns.size(); i++)
+                    for (int i = 0; i < patterns.size(); i++)
                     {
                         ItemStack stack = patterns.get(i);
-                        if(stack != null && !stack.isEmpty())
+                        if (stack != null && !stack.isEmpty())
                             newBE.getTerminalPatternInventory().insertItem(i, stack, false);
                     }
                 }

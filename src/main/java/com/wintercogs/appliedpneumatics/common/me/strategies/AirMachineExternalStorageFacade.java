@@ -54,12 +54,12 @@ public final class AirMachineExternalStorageFacade extends ExternalStorageFacade
     @Override
     protected int insertExternal(AEKey what, int amount, Actionable mode)
     {
-        if(!(what instanceof AirKey)) return 0;
+        if (!(what instanceof AirKey)) return 0;
         // 最大余量与意图插入数的最小值
-        long space = Math.max(0,AirHandlerHelper.getMaxAirInPressure(airHandler) - airHandler.getAir());
+        long space = Math.max(0, AirHandlerHelper.getMaxAirInPressure(airHandler) - airHandler.getAir());
         long wantInsert = Math.min(space, amount);
         int maxInsert = APMath.ClampToInt(wantInsert);
-        if(!mode.isSimulate() && maxInsert > 0)
+        if (!mode.isSimulate() && maxInsert > 0)
             airHandler.addAir(maxInsert);
         return maxInsert;
     }
@@ -67,12 +67,12 @@ public final class AirMachineExternalStorageFacade extends ExternalStorageFacade
     @Override
     protected int extractExternal(AEKey what, int amount, Actionable mode)
     {
-        if(!(what instanceof AirKey)) return 0;
+        if (!(what instanceof AirKey)) return 0;
 
         long available = Math.max(0, airHandler.getAir());
         long wantExtract = Math.min(available, amount);
         int maxExtract = APMath.ClampToInt(wantExtract);
-        if(!mode.isSimulate() && maxExtract > 0)
+        if (!mode.isSimulate() && maxExtract > 0)
             airHandler.addAir(-maxExtract);
         return maxExtract;
     }
