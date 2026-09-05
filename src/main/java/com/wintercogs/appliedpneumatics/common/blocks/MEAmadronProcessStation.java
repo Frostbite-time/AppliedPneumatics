@@ -24,9 +24,9 @@ public class MEAmadronProcessStation extends AEBaseEntityBlock<MEAmadronProcessS
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult)
     {
         super.use(state, level, pos, player, hand, hitResult);
-        if(!level.isClientSide()&&!player.isShiftKeyDown())
+        if (!level.isClientSide() && !player.isShiftKeyDown())
         {
-            if(level.getBlockEntity(pos) instanceof MEAmadronProcessStationBlockEntity be)
+            if (level.getBlockEntity(pos) instanceof MEAmadronProcessStationBlockEntity be)
                 MenuOpener.open(APMenus.ME_AMADRON_PROCESS_STATION_MENU.get(), player, MenuLocators.forBlockEntity(be));
         }
         return InteractionResult.SUCCESS;

@@ -72,7 +72,7 @@ public class AirStroageModels
                 APItems.PORTABLE_AIR_CELL_16M.get(),
                 APItems.PORTABLE_AIR_CELL_64M.get(),
                 APItems.PORTABLE_AIR_CELL_256M.get()
-                );
+        );
     }
 
 }

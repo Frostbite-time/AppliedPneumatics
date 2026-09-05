@@ -18,10 +18,14 @@ public class MEPressureInterfaceMenu extends UpgradeableMenu<MEPressureInterface
 
     // @GuiSync 同步字段（客户端可见最新值，走AE的DataSynchronization同步方案）
     // id从10开始，避免和父类冲突
-    @GuiSync(10) public int latestAir = 0;
-    @GuiSync(11) public int latestVolume = 0;
-    @GuiSync(12) public double latestExpectedPressure = 0f;
-    @GuiSync(13) public double latestDangerPressure = 0f;
+    @GuiSync(10)
+    public int latestAir = 0;
+    @GuiSync(11)
+    public int latestVolume = 0;
+    @GuiSync(12)
+    public double latestExpectedPressure = 0f;
+    @GuiSync(13)
+    public double latestDangerPressure = 0f;
 
     public MEPressureInterfaceMenu(int id, Inventory playerInv, @NotNull MEPressureInterfaceBlockEntity host)
     {
@@ -61,7 +65,8 @@ public class MEPressureInterfaceMenu extends UpgradeableMenu<MEPressureInterface
         sendClientAction(changeExpectedPressureAction, expectedPressureDelta);
     }
 
-    private void onClientChangeExpectedPressure(float delta) {
+    private void onClientChangeExpectedPressure(float delta)
+    {
         var be = getHost();
         if (be.isRemoved()) return;
         float now = be.getExpectedPressure();

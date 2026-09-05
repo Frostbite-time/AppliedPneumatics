@@ -49,7 +49,7 @@ public class AirCellInventory implements StorageCell
         this.cellType = cell;
         this.host = host; // 记录宿主
         BlockEntity be = tryGetHostBE(host);
-        if(be != null && be.getLevel() != null)
+        if (be != null && be.getLevel() != null)
             this.hostPos = new APDelayedBreaker.BlockKey(be.getLevel().dimension(), be.getBlockPos());
         else
             this.hostPos = null;
@@ -60,7 +60,7 @@ public class AirCellInventory implements StorageCell
         // StorageCell的构建方法只会在插入驱动器的一瞬间触发
         // 这里一次性获取状态即可
         this.hasSecurityUpgrade = cellType.getUpgrades(itemStack).isInstalled(APItems.SECURITY_CARD.get());
-        this.hasVacuumUpgrade   = cellType.getUpgrades(itemStack).isInstalled(APItems.VACUUM_CARD.get());
+        this.hasVacuumUpgrade = cellType.getUpgrades(itemStack).isInstalled(APItems.VACUUM_CARD.get());
     }
 
 
@@ -103,18 +103,24 @@ public class AirCellInventory implements StorageCell
         if (amount <= 0 || what != AirKey.INSTANCE) return 0;
 
         long remaining = getRemainingAmount();
-        if (remaining <= 0) {
+        if (remaining <= 0)
+        {
             // 没空间
-            if (hasVacuumUpgrade) {
+            if (hasVacuumUpgrade)
+            {
                 // 真空卡：全部视为接收，不触发破坏
                 return amount;
-            } else {
+            }
+            else
+            {
                 // 无真空卡：如果也没有安全卡，安排炸来源机器（仅 MODULATE）
-                if (!hasSecurityUpgrade && mode == Actionable.MODULATE) {
+                if (!hasSecurityUpgrade && mode == Actionable.MODULATE)
+                {
                     // 持久化元件，避免掉落前丢数据
                     markChanged();
                     // 延迟炸
-                    if (hostPos != null) {
+                    if (hostPos != null)
+                    {
                         APDelayedBreaker.breakNextTick(hostPos.dim(), hostPos.pos());
                     }
                 }
@@ -132,13 +138,18 @@ public class AirCellInventory implements StorageCell
 
             // 处理“溢出的部分”
             long overflow = amount - toStore;
-            if (overflow > 0) {
-                if (hasVacuumUpgrade) {
+            if (overflow > 0)
+            {
+                if (hasVacuumUpgrade)
+                {
                     // 有真空卡：把溢出当作成功吞掉
                     return amount;
-                } else if (!hasSecurityUpgrade) {
+                }
+                else if (!hasSecurityUpgrade)
+                {
                     // 无真空且无安全卡：安排炸来源机器
-                    if (hostPos != null) {
+                    if (hostPos != null)
+                    {
                         // 元件已 markChanged()，可以安全延迟炸
                         APDelayedBreaker.breakNextTick(hostPos.dim(), hostPos.pos());
                     }
@@ -170,7 +181,8 @@ public class AirCellInventory implements StorageCell
     @Override
     public void getAvailableStacks(KeyCounter out)
     {
-        if (storedAir > 0) {
+        if (storedAir > 0)
+        {
             out.add(AirKey.INSTANCE, storedAir);
         }
     }
@@ -183,31 +195,43 @@ public class AirCellInventory implements StorageCell
 
     // 辅助方法---------------------------------------------------------------------------------------------
 
-    /** 写回策略：有 host -> 只通知；无 host -> 直接落盘 */
+    /**
+     * 写回策略：有 host -> 只通知；无 host -> 直接落盘
+     */
     private void markChanged()
     {
-        if(Platform.isClient()) return;
+        if (Platform.isClient()) return;
 
         isPersisted = false;
-        if (host != null) {
+        if (host != null)
+        {
             host.saveChanges(); // 交给宿主持久化
-        } else {
+        }
+        else
+        {
             persist(); // 没有宿主就自己写回
         }
     }
 
-    /** 总字节数：来自物品定义 */
+    /**
+     * 总字节数：来自物品定义
+     */
     public long getTotalBytes()
     {
         return cellType.getTotalBytes();
     }
 
-    /** 每个字节可存的空气量 */
-    public long getAmountPerByte() {
+    /**
+     * 每个字节可存的空气量
+     */
+    public long getAmountPerByte()
+    {
         return AirKeyType.INSTANCE.getAmountPerByte();
     }
 
-    /** 已用字节 = ceil(storedAir / amountPerByte) */
+    /**
+     * 已用字节 = ceil(storedAir / amountPerByte)
+     */
     public long getUsedBytes()
     {
         long apb = getAmountPerByte();
@@ -220,7 +244,9 @@ public class AirCellInventory implements StorageCell
         return Math.max(0, free);
     }
 
-    /** 当前未占满的那个字节里还能塞多少空气（0 表示正好卡边界或为空） */
+    /**
+     * 当前未占满的那个字节里还能塞多少空气（0 表示正好卡边界或为空）
+     */
     public long getUnusedInCurrentByte()
     {
         long apb = getAmountPerByte();
@@ -228,7 +254,9 @@ public class AirCellInventory implements StorageCell
         return (mod == 0) ? 0 : (apb - mod);
     }
 
-    /** 还能存多少空气，当前半字节空隙 + 剩余字节完整容量 */
+    /**
+     * 还能存多少空气，当前半字节空隙 + 剩余字节完整容量
+     */
     public long getRemainingAmount()
     {
         long apb = getAmountPerByte();
@@ -238,7 +266,7 @@ public class AirCellInventory implements StorageCell
     public long getAirFromStack()
     {
         CompoundTag tag = itemStack.getOrCreateTag();
-        if(tag.contains(IAirStorageCell.AIR_STORED_TAG))
+        if (tag.contains(IAirStorageCell.AIR_STORED_TAG))
         {
             return tag.getLong(IAirStorageCell.AIR_STORED_TAG);
         }
@@ -253,7 +281,8 @@ public class AirCellInventory implements StorageCell
         tag.putLong(IAirStorageCell.AIR_STORED_TAG, air);
     }
 
-    public static @Nullable BlockEntity tryGetHostBE(ISaveProvider host) {
+    public static @Nullable BlockEntity tryGetHostBE(ISaveProvider host)
+    {
         if (host == null) return null;
 
         // 1. 直接是 BlockEntity
@@ -265,7 +294,7 @@ public class AirCellInventory implements StorageCell
         // 2. 是 IPart
         if (host instanceof IPart part)
         {
-            if(part instanceof AEBasePart aeBasePart)
+            if (part instanceof AEBasePart aeBasePart)
             {
                 return aeBasePart.getBlockEntity();
             }
@@ -274,9 +303,9 @@ public class AirCellInventory implements StorageCell
                 IGridNode node = part.getGridNode();
                 if (node != null)
                 {
-                    if(node.getOwner() instanceof BlockEntity be)
+                    if (node.getOwner() instanceof BlockEntity be)
                         return be;
-                    else if(node instanceof AEBasePart aeBasePart)
+                    else if (node instanceof AEBasePart aeBasePart)
                         return aeBasePart.getBlockEntity();
                 }
             }
@@ -288,16 +317,17 @@ public class AirCellInventory implements StorageCell
             IGridNode node = actionHost.getActionableNode();
             if (node != null)
             {
-                if(node.getOwner() instanceof BlockEntity be)
+                if (node.getOwner() instanceof BlockEntity be)
                     return be;
-                else if(node instanceof AEBasePart aeBasePart)
+                else if (node instanceof AEBasePart aeBasePart)
                     return aeBasePart.getBlockEntity();
             }
         }
 
         // 4. Lambda 情况：反射查找捕获字段
         Class<?> hostClass = host.getClass();
-        try {
+        try
+        {
             for (Field field : hostClass.getDeclaredFields())
             {
                 field.setAccessible(true);
@@ -311,7 +341,7 @@ public class AirCellInventory implements StorageCell
                 }
                 if (value instanceof IPart part)
                 {
-                    if(part instanceof AEBasePart aeBasePart)
+                    if (part instanceof AEBasePart aeBasePart)
                     {
                         return aeBasePart.getBlockEntity();
                     }
@@ -320,25 +350,28 @@ public class AirCellInventory implements StorageCell
                         IGridNode node = part.getGridNode();
                         if (node != null)
                         {
-                            if(node.getOwner() instanceof BlockEntity be)
+                            if (node.getOwner() instanceof BlockEntity be)
                                 return be;
-                            else if(node instanceof AEBasePart aeBasePart)
+                            else if (node instanceof AEBasePart aeBasePart)
                                 return aeBasePart.getBlockEntity();
                         }
                     }
                 }
-                if (value instanceof IActionHost actionHost) {
+                if (value instanceof IActionHost actionHost)
+                {
                     IGridNode node = actionHost.getActionableNode();
                     if (node != null)
                     {
-                        if(node.getOwner() instanceof BlockEntity be)
+                        if (node.getOwner() instanceof BlockEntity be)
                             return be;
-                        else if(node instanceof AEBasePart aeBasePart)
+                        else if (node instanceof AEBasePart aeBasePart)
                             return aeBasePart.getBlockEntity();
                     }
                 }
             }
-        } catch (Throwable ignored) {
+        }
+        catch (Throwable ignored)
+        {
             // 出错就返回 null
         }
 

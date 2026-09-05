@@ -19,18 +19,26 @@ import java.util.List;
 
 public class AirKeyRenderHandler implements AEKeyRenderHandler<AirKey>
 {
-    /** PNC 空气粒子整图 32×32 */
+    /**
+     * PNC 空气粒子整图 32×32
+     */
     private static final ResourceLocation AIR_PARTICLE_TEX =
             new ResourceLocation("pneumaticcraft", "textures/particle/air_particle.png");
 
-    /** 槽位尺寸 */
+    /**
+     * 槽位尺寸
+     */
     private static final int SLOT_SIZE = 16;
 
-    /** 发射密度（每 tick 粒子数） */
+    /**
+     * 发射密度（每 tick 粒子数）
+     */
     private static final int EMIT_MIN = 3;
     private static final int EMIT_MAX = 10;
 
-    /** 运动与显示参数 */
+    /**
+     * 运动与显示参数
+     */
     private static final float SPEED_PX_PER_TICK = 0.3f; // 速率
     private static final int BASE_SCREEN_SIZE = 3; // 粒子在屏幕上的基准缩放尺寸（像素）
     private static final int SIZE_JITTER_PX = 1; // 尺寸微抖动（±1）
@@ -38,7 +46,9 @@ public class AirKeyRenderHandler implements AEKeyRenderHandler<AirKey>
     private static final float START_ALPHA = 0.9f; // 最高透明度
     private static final float Z_LAYER = 0.01f; // 用 pose.translate 控制深度
 
-    /** 全局共享的发射器（在(0,0)-(16,16)坐标系内运动） */
+    /**
+     * 全局共享的发射器（在(0,0)-(16,16)坐标系内运动）
+     */
     private final Emitter sharedEmitter = new Emitter();
 
     @Override
@@ -48,7 +58,7 @@ public class AirKeyRenderHandler implements AEKeyRenderHandler<AirKey>
         if (level == null) return;
 
         // 时间统一为 tick：gameTime(tick) + partial(tick)
-        final long  gameTime = level.getGameTime();
+        final long gameTime = level.getGameTime();
         final float partial = (mc.getFrameTimeNs() / 1_000_000_000f) * 20f;
         final float nowT = gameTime + partial;
 
@@ -95,9 +105,13 @@ public class AirKeyRenderHandler implements AEKeyRenderHandler<AirKey>
         private final List<P> particles = new ArrayList<>();
         private long lastEmitTick = Long.MIN_VALUE;
 
-        Emitter() {}
+        Emitter()
+        {
+        }
 
-        /** 每 tick 生成若干粒子；寿命由命中边界的最小正时间决定 */
+        /**
+         * 每 tick 生成若干粒子；寿命由命中边界的最小正时间决定
+         */
         void tickAndSpawn(Level level, long gameTime)
         {
             // 清理超寿命
@@ -120,7 +134,11 @@ public class AirKeyRenderHandler implements AEKeyRenderHandler<AirKey>
                 float dirX = Mth.cos(angle);
                 float dirY = Mth.sin(angle);
                 final float len = Mth.sqrt(dirX * dirX + dirY * dirY);
-                if (len != 0) { dirX /= len; dirY /= len; }
+                if (len != 0)
+                {
+                    dirX /= len;
+                    dirY /= len;
+                }
 
                 // 粒子屏幕尺寸（整图缩放）
                 final int screenSize = Mth.clamp(
@@ -154,7 +172,7 @@ public class AirKeyRenderHandler implements AEKeyRenderHandler<AirKey>
                 float timeToEdge = Float.POSITIVE_INFINITY;
                 if (timeX > 0f && Float.isFinite(timeX)) timeToEdge = Math.min(timeToEdge, timeX);
                 if (timeY > 0f && Float.isFinite(timeY)) timeToEdge = Math.min(timeToEdge, timeY);
-                if (!Float.isFinite(timeToEdge))   timeToEdge = 1.0f; // 守备
+                if (!Float.isFinite(timeToEdge)) timeToEdge = 1.0f; // 守备
 
                 final float life = Math.min(timeToEdge, MAX_TICKS_LIFE);
 
@@ -165,7 +183,9 @@ public class AirKeyRenderHandler implements AEKeyRenderHandler<AirKey>
             }
         }
 
-        /** 绘制到指定槽位：把规范槽位坐标整体加上 (offsetX, offsetY) 偏移 */
+        /**
+         * 绘制到指定槽位：把规范槽位坐标整体加上 (offsetX, offsetY) 偏移
+         */
         void drawAt(GuiGraphics gg, float nowT, int offsetX, int offsetY)
         {
             final int texW = 32, texH = 32; // 源纹理大小（像素）
@@ -176,7 +196,11 @@ public class AirKeyRenderHandler implements AEKeyRenderHandler<AirKey>
 
                 float age = nowT - p.birthTick; // tick
                 if (age < 0) age = 0;
-                if (age > p.life) { particles.remove(i); continue; }
+                if (age > p.life)
+                {
+                    particles.remove(i);
+                    continue;
+                }
 
                 float posX = p.x0 + p.vx * age;
                 float posY = p.y0 + p.vy * age;
@@ -223,5 +247,7 @@ public class AirKeyRenderHandler implements AEKeyRenderHandler<AirKey>
      * @param life       寿命（tick）
      * @param screenSize 屏幕绘制尺寸（把 32×32 等比缩放到此像素）
      */
-    private record P(float x0, float y0, float vx, float vy, float birthTick, float life, int screenSize) {}
+    private record P(float x0, float y0, float vx, float vy, float birthTick, float life, int screenSize)
+    {
+    }
 }

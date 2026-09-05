@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 public class AirKeyType extends AEKeyType
 {
     public static final Component NAME = Component.translatable("appliedpneumatics.me.key.air");
-    private static final ResourceLocation ID = ResourceLocation.tryBuild(AppliedPneumatics.MODID,"air_type");
+    private static final ResourceLocation ID = ResourceLocation.tryBuild(AppliedPneumatics.MODID, "air_type");
 
     public static final AirKeyType INSTANCE = new AirKeyType();
 

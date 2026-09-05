@@ -21,20 +21,24 @@ public interface IAirStorageCell extends IUpgradeableItem
         if (!tag.contains(AIR_STORED_TAG)) return 0;
         return tag.getLong("ap_air_stored");
     }
+
     static long amountPerByte()
     {
         return AirKeyType.INSTANCE.getAmountPerByte();
     }
+
     static long usedBytes(long storedAir)
     {
         long apb = amountPerByte();
         return apb <= 0 ? 0 : (storedAir + apb - 1) / apb;
     }
+
     static long freeBytes(int totalBytes, long usedBytes)
     {
         long f = totalBytes - usedBytes;
         return Math.max(0, f);
     }
+
     static long unusedInCurrentByte(long storedAir)
     {
         long apb = amountPerByte();
@@ -42,6 +46,7 @@ public interface IAirStorageCell extends IUpgradeableItem
         long mod = storedAir % apb;
         return mod == 0 ? 0 : (apb - mod);
     }
+
     static long remainingAmount(int totalBytes, long storedAir)
     {
         long apb = amountPerByte();
@@ -49,6 +54,7 @@ public interface IAirStorageCell extends IUpgradeableItem
         long fb = freeBytes(totalBytes, usedBytes(storedAir));
         return fb * apb + unusedInCurrentByte(storedAir);
     }
+
     static CellState calcState(int totalBytes, long storedAir)
     {
         if (storedAir <= 0) return CellState.EMPTY;

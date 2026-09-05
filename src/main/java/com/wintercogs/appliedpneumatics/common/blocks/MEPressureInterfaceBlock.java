@@ -29,9 +29,9 @@ public class MEPressureInterfaceBlock extends AEBaseEntityBlock<MEPressureInterf
     public @NotNull InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult)
     {
         super.use(state, level, pos, player, hand, hitResult);
-        if(!level.isClientSide()&&!player.isShiftKeyDown())
+        if (!level.isClientSide() && !player.isShiftKeyDown())
         {
-            if(level.getBlockEntity(pos) instanceof MEPressureInterfaceBlockEntity be)
+            if (level.getBlockEntity(pos) instanceof MEPressureInterfaceBlockEntity be)
                 MenuOpener.open(APMenus.ME_PRESSURE_INTERFACE_MENU.get(), player, MenuLocators.forBlockEntity(be));
         }
         return InteractionResult.SUCCESS;

@@ -66,7 +66,7 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
         {
             // 基础容量/使用
             long stored = IAirStorageCell.getStoredAir(stack);
-            long used   = IAirStorageCell.usedBytes(stored);
+            long used = IAirStorageCell.usedBytes(stored);
             lines.add(Tooltips.bytesUsed(used, getTotalBytes()));
             // 单类型：0 或 1
             int typesUsed = stored > 0 ? 1 : 0;
@@ -87,9 +87,11 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
         // 内容预览（只有 Air 一种）
         List<GenericStack> content = Collections.emptyList();
         boolean hasMore = false;
-        if (showCnt) {
+        if (showCnt)
+        {
             long stored = IAirStorageCell.getStoredAir(stack);
-            if (stored > 0) {
+            if (stored > 0)
+            {
                 content = List.of(new GenericStack(AirKey.INSTANCE, stored));
             }
         }
@@ -123,8 +125,11 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
     {
         return FuzzyMode.IGNORE_ALL;
     }
+
     @Override
-    public void setFuzzyMode(ItemStack is, FuzzyMode fzMode) {}
+    public void setFuzzyMode(ItemStack is, FuzzyMode fzMode)
+    {
+    }
 
     // 用于锁定拆解配方的特定路径
     public ResourceLocation getRecipeId()
@@ -143,11 +148,11 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
 
     private boolean disassembleDrive(ItemStack stack, Level level, Player player)
     {
-        if(!player.isShiftKeyDown()) return false;
+        if (!player.isShiftKeyDown()) return false;
         Recipe<?> recipe = level.getRecipeManager().byKey(this.getRecipeId()).orElse(null);
         if (recipe instanceof CraftingRecipe)
         {
-            CraftingRecipe craftingRecipe = (CraftingRecipe)recipe;
+            CraftingRecipe craftingRecipe = (CraftingRecipe) recipe;
             if (level.isClientSide()) return true;
 
             Inventory playerInventory = player.getInventory();
@@ -160,13 +165,13 @@ public class AirStorageCell extends Item implements ICellWorkbenchItem, IAirStor
             {
                 playerInventory.setItem(playerInventory.selected, ItemStack.EMPTY);
 
-                for(Ingredient ingredient : craftingRecipe.getIngredients())
+                for (Ingredient ingredient : craftingRecipe.getIngredients())
                 {
                     ItemStack ingredientStack = ingredient.getItems()[0].copy();
                     playerInventory.placeItemBackInInventory(ingredientStack);
                 }
 
-                for(ItemStack upgrade : this.getUpgrades(stack))
+                for (ItemStack upgrade : this.getUpgrades(stack))
                 {
                     playerInventory.placeItemBackInInventory(upgrade);
                 }

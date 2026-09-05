@@ -27,7 +27,7 @@ public class AirExternalStorageStrategy implements ExternalStorageStrategy
     public @Nullable MEStorage createWrapper(boolean extractableOnly, Runnable injectOrExtractCallback)
     {
         BlockEntity be = serverLevel.getBlockEntity(blockPos);
-        if(be == null) return null;
+        if (be == null) return null;
 
         return be.getCapability(PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY, side)
                 .map(AirMachineExternalStorageFacade::new)

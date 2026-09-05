@@ -13,6 +13,7 @@ public class APBlockStates
         ROOM_TEMPERATURE("room_temperature");
 
         private final String name;
+
         TemperatureState(String name)
         {
             this.name = name;
@@ -24,5 +25,6 @@ public class APBlockStates
             return name;
         }
     }
+
     public static final EnumProperty<TemperatureState> TEMP_STATE = EnumProperty.create("temperature_state", TemperatureState.class);
 }

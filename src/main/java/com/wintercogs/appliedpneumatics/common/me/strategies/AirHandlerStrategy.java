@@ -36,7 +36,7 @@ public final class AirHandlerStrategy extends HandlerStrategy<IAirHandlerMachine
     @Override
     public @Nullable GenericStack getStack(AEKey what, long amount)
     {
-        if(what instanceof AirKey && amount > 0) return new GenericStack(what, amount);
+        if (what instanceof AirKey && amount > 0) return new GenericStack(what, amount);
 
         return null;
     }
@@ -44,12 +44,12 @@ public final class AirHandlerStrategy extends HandlerStrategy<IAirHandlerMachine
     @Override
     public long insert(IAirHandlerMachine airHandler, AEKey what, long amount, Actionable mode)
     {
-        if(!(what instanceof AirKey)) return 0;
+        if (!(what instanceof AirKey)) return 0;
         // 最大余量与意图插入数的最小值
         long space = Math.max(0, AirHandlerHelper.getMaxAirInPressure(airHandler) - airHandler.getAir());
         long wantInsert = Math.min(space, amount);
         int maxInsert = APMath.ClampToInt(wantInsert);
-        if(!mode.isSimulate() && maxInsert > 0)
+        if (!mode.isSimulate() && maxInsert > 0)
             airHandler.addAir(maxInsert);
         return maxInsert;
     }

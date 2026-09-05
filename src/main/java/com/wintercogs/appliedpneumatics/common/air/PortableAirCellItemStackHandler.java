@@ -14,7 +14,9 @@ import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** 用于将PortableAirStorageCell包装为IAirHandler能力用于暴露 */
+/**
+ * 用于将PortableAirStorageCell包装为IAirHandler能力用于暴露
+ */
 public class PortableAirCellItemStackHandler implements ICapabilityProvider, IAirHandlerItem
 {
     private final ItemStack container;
@@ -23,7 +25,7 @@ public class PortableAirCellItemStackHandler implements ICapabilityProvider, IAi
     public PortableAirCellItemStackHandler(ItemStack container)
     {
         Validate.isTrue(container.getItem() instanceof IAirStorageCell, "itemstack " + String.valueOf(container) + " must be an IAirStorageCell!", new Object[0]);
-        this.storageCell = (IAirStorageCell)container.getItem();
+        this.storageCell = (IAirStorageCell) container.getItem();
         this.container = container;
     }
 
@@ -61,7 +63,9 @@ public class PortableAirCellItemStackHandler implements ICapabilityProvider, IAi
     }
 
     @Override
-    public void setBaseVolume(int size) {}
+    public void setBaseVolume(int size)
+    {
+    }
 
     @Override
     public int getVolume()

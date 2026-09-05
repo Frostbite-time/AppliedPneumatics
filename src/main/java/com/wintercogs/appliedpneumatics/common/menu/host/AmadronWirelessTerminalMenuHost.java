@@ -17,13 +17,19 @@ public class AmadronWirelessTerminalMenuHost extends WirelessTerminalMenuHost im
 {
     // me网络存储、无线接入点连接状态均由父类处理
 
-    /** 样板槽序列化名 */
+    /**
+     * 样板槽序列化名
+     */
     private static final String PATTERN_INV_NAME = "amadron_pattern_inv";
 
-    /** 物品类记录 */
+    /**
+     * 物品类记录
+     */
     private final AmadronWirelessTerminalItem terminalItem;
 
-    /** 样板槽位 */
+    /**
+     * 样板槽位
+     */
     private final AppEngInternalInventory inventory = new AppEngInternalInventory(this, 2);
 
     public AmadronWirelessTerminalMenuHost(Player player, @Nullable Integer slot, ItemStack itemStack, BiConsumer<Player, ISubMenu> returnToMainMenu)

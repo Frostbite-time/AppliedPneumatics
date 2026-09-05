@@ -21,7 +21,7 @@ public class APBlocks
 
     // ME气压接口
     public static final RegistryObject<MEPressureInterfaceBlock> ME_PRESSURE_INTERFACE_BLOCK = registerBlock("me_pressure_interface_block",
-            ()-> new MEPressureInterfaceBlock(BlockBehaviour.Properties.of().strength(2f)));
+            () -> new MEPressureInterfaceBlock(BlockBehaviour.Properties.of().strength(2f)));
 
     // ME亚马龙处理站
     public static final RegistryObject<MEAmadronProcessStation> ME_AMADRON_PROCESS_STATION = registerBlock("me_amadron_process_station",
@@ -37,14 +37,14 @@ public class APBlocks
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block)
     {
-        RegistryObject<T> toReturn = BLOCKS.register(name,block);
-        registerBlockItem(name,toReturn);
+        RegistryObject<T> toReturn = BLOCKS.register(name, block);
+        registerBlockItem(name, toReturn);
         return toReturn;
     }
 
     private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block)
     {
-        APItems.ITEMS.register(name,() -> new BlockItem(block.get(), new Item.Properties()));
+        APItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
     }
 
     public static void register(IEventBus eventBus)

@@ -61,7 +61,7 @@ public class AEPlugin
         ContainerItemStrategy.register(AirKeyType.INSTANCE, AirKey.class, new AirContainerItemStrategy());
 
         // p2p协调
-        P2PTunnelAttunement.registerAttunementApi(APItems.AIR_P2P_TUNEL.get() , PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY, Component.translatable("appliedpneumatics.pneumatic"));
+        P2PTunnelAttunement.registerAttunementApi(APItems.AIR_P2P_TUNEL.get(), PNCCapabilities.AIR_HANDLER_ITEM_CAPABILITY, Component.translatable("appliedpneumatics.pneumatic"));
         P2PTunnelAttunement.registerAttunementTag(APItems.HEAT_P2P_TUNEL.get()); // 用P2PTunnelAttunement.getAttunementTag(APItems.HEAT_P2P_TUNEL.get());获取此标签来标记物品
 
         // 升级卡支持
@@ -75,13 +75,13 @@ public class AEPlugin
         Upgrades.add(AEItems.SPEED_CARD, APBlocks.ME_TEMPERATURE_INTERFACE.get(), 4);
 
         // 存储元件支持的升级卡（安全卡、真空卡） 其中真空卡为气体版溢出销毁卡
-        for(RegistryObject<AirStorageCell> cell : APItems.getCELLS())
+        for (RegistryObject<AirStorageCell> cell : APItems.getCELLS())
         {
-            Upgrades.add(APItems.SECURITY_CARD.get(), cell.get(), 1 ,CELL_UPGRADE_GROUP);
-            Upgrades.add(APItems.VACUUM_CARD.get(), cell.get(), 1 ,CELL_UPGRADE_GROUP);
+            Upgrades.add(APItems.SECURITY_CARD.get(), cell.get(), 1, CELL_UPGRADE_GROUP);
+            Upgrades.add(APItems.VACUUM_CARD.get(), cell.get(), 1, CELL_UPGRADE_GROUP);
         }
         // 便携气体元件支持的升级卡（安全卡、真空卡、能量卡、充气卡）
-        for(RegistryObject<PortableAirStorageCell> portableCell : APItems.getPortableCells())
+        for (RegistryObject<PortableAirStorageCell> portableCell : APItems.getPortableCells())
         {
             Upgrades.add(APItems.SECURITY_CARD.get(), portableCell.get(), 1, PORTABLE_CELL_UPGRADE_GROUP);
             Upgrades.add(APItems.VACUUM_CARD.get(), portableCell.get(), 1, PORTABLE_CELL_UPGRADE_GROUP);
@@ -104,11 +104,11 @@ public class AEPlugin
     public static StackImportStrategy createAirImport(ServerLevel level, BlockPos fromPos, Direction fromSide)
     {
         return new StorageImportStrategy<>(
-            PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY,
-            AirHandlerStrategy.INSTANCE,
-            level,
-            fromPos,
-            fromSide
+                PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY,
+                AirHandlerStrategy.INSTANCE,
+                level,
+                fromPos,
+                fromSide
         );
     }
 
@@ -122,6 +122,8 @@ public class AEPlugin
                 level,
                 fromPos,
                 fromSide
-        ){};
+        )
+        {
+        };
     }
 }

@@ -293,10 +293,12 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
     {
         return AppliedPneumatics.makeId("cells/housing/" + BuiltInRegistries.ITEM.getKey(housing.asItem()).getPath());
     }
+
     private static ResourceLocation cellShapedId(ItemLike cell)
     {
         return AppliedPneumatics.makeId("cells/shaped/" + BuiltInRegistries.ITEM.getKey(cell.asItem()).getPath());
     }
+
     private static ResourceLocation cellShapelessId(ItemLike cell)
     {
         return AppliedPneumatics.makeId("cells/shapeless/" + BuiltInRegistries.ITEM.getKey(cell.asItem()).getPath());
@@ -319,7 +321,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         megaTierRows.add(new TierRow(MEGAItems.CELL_COMPONENT_256M, APItems.AIR_CELL_256M.get(), APItems.PORTABLE_AIR_CELL_256M.get()));
 
         // k系列
-        for(TierRow tierRow : commonTierRows)
+        for (TierRow tierRow : commonTierRows)
         {
             ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, tierRow.cell)
                     .requires(APItems.AIR_CELL_SHELL.get())
@@ -336,7 +338,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                     .save(recipeOutput, cellShapelessId(tierRow.portableCell));
         }
         // m系列
-        for(TierRow tierRow : megaTierRows)
+        for (TierRow tierRow : megaTierRows)
         {
             ShapelessRecipeBuilder cellBuilder = ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, tierRow.cell)
                     .requires(APItems.MEGA_AIR_CELL_SHELL.get())
@@ -361,28 +363,35 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
     }
 
     // 用于快速添加亚马龙交易
-    private AmadronRecipeBuilder amadronStatic(AmadronTradeResource in, AmadronTradeResource out) {
+    private AmadronRecipeBuilder amadronStatic(AmadronTradeResource in, AmadronTradeResource out)
+    {
         return new AmadronRecipeBuilder(in, out, true, 0)
                 .addCriterion(getHasName(ModItems.AMADRON_TABLET.get()), has(ModItems.AMADRON_TABLET.get()));
     }
 
     // 快速添加压力室配方
-    private PressureChamberRecipeBuilder pressureChamber(List<Ingredient> in, float pressure, ItemStack... out) {
+    private PressureChamberRecipeBuilder pressureChamber(List<Ingredient> in, float pressure, ItemStack... out)
+    {
         return new PressureChamberRecipeBuilder(in, pressure, out)
                 .addCriterion(getHasName(ModBlocks.PRESSURE_CHAMBER_VALVE.get()), has(ModBlocks.PRESSURE_CHAMBER_VALVE.get()));
     }
 
     // 快速添加装配室配方
-    private AssemblyRecipeBuilder assembly(Ingredient input, ItemStack output, AssemblyRecipe.AssemblyProgramType programType) {
+    private AssemblyRecipeBuilder assembly(Ingredient input, ItemStack output, AssemblyRecipe.AssemblyProgramType programType)
+    {
         return new AssemblyRecipeBuilder(input, output, programType)
                 .addCriterion(getHasName(ModBlocks.ASSEMBLY_CONTROLLER.get()), has(ModBlocks.ASSEMBLY_CONTROLLER.get()));
     }
 
-    /** 用于描述元件与组件之间的对应关系 */
+    /**
+     * 用于描述元件与组件之间的对应关系
+     */
     private record TierRow(
             ItemLike component,
             ItemLike cell,
             ItemLike portableCell
-    ) {}
+    )
+    {
+    }
 
 }

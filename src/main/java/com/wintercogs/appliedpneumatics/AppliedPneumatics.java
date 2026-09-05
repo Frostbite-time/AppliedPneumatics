@@ -44,7 +44,7 @@ public class AppliedPneumatics
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
         modEventBus.addListener((RegisterEvent event) -> {
-            if(event.getRegistryKey().equals(Registries.BLOCK))
+            if (event.getRegistryKey().equals(Registries.BLOCK))
                 AEPlugin.init();
         });
 
@@ -54,7 +54,7 @@ public class AppliedPneumatics
         APBlocks.register(modEventBus);
         APBlockEntities.register(modEventBus);
 
-        if(FMLEnvironment.dist == Dist.CLIENT)
+        if (FMLEnvironment.dist == Dist.CLIENT)
         {
             AppliedPneumaticsClient.clientInit();
             AppliedPneumaticsClient.clientRegister(modEventBus, MinecraftForge.EVENT_BUS);
@@ -63,11 +63,11 @@ public class AppliedPneumatics
 
     private void constructMod(final FMLConstructModEvent event)
     {
-        if(ModList.get().isLoaded(MEGA_CELL_MODID))
+        if (ModList.get().isLoaded(MEGA_CELL_MODID))
         {
             MEGA_CELL_LOADED = true;
         }
-        if(ModList.get().isLoaded(EAE_MODID))
+        if (ModList.get().isLoaded(EAE_MODID))
         {
             EAE_LOADED = true;
         }
@@ -77,7 +77,7 @@ public class AppliedPneumatics
     {
         AEPlugin.register();
 
-        if(FMLEnvironment.dist == Dist.CLIENT)
+        if (FMLEnvironment.dist == Dist.CLIENT)
             AppliedPneumaticsClient.clientCommonSetup();
     }
 

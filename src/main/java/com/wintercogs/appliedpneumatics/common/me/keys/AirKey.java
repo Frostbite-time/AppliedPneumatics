@@ -19,11 +19,13 @@ import java.util.List;
  */
 public class AirKey extends AEKey
 {
-    private static final ResourceLocation ID = ResourceLocation.tryBuild(AppliedPneumatics.MODID,"air_key");
+    private static final ResourceLocation ID = ResourceLocation.tryBuild(AppliedPneumatics.MODID, "air_key");
 
     public static final AirKey INSTANCE = new AirKey();
 
-    private AirKey() {}
+    private AirKey()
+    {
+    }
 
     @Override
     public AEKeyType getType()
@@ -70,7 +72,9 @@ public class AirKey extends AEKey
 
     // 无掉落物
     @Override
-    public void addDrops(long amount, List<ItemStack> drops, Level level, BlockPos pos) {}
+    public void addDrops(long amount, List<ItemStack> drops, Level level, BlockPos pos)
+    {
+    }
 
     @Override
     public int hashCode()

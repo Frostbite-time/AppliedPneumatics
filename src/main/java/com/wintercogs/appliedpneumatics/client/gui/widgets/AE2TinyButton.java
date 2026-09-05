@@ -9,7 +9,7 @@
 //import net.minecraft.resources.ResourceLocation;
 //import net.minecraft.util.Mth;
 //
-///** 完成美工大人的任务罢了 */
+/// ** 完成美工大人的任务罢了 */
 //public class AE2TinyButton extends AE2Button
 //{
 //    protected static final WidgetSprites SPRITES = new WidgetSprites(

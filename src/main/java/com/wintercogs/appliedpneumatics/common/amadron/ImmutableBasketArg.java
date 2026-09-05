@@ -11,4 +11,6 @@ import me.desht.pneumaticcraft.common.amadron.ShoppingBasket;
 public record ImmutableBasketArg(
         @JsonAdapter(ImmutableBasketJsonAdapter.class)
         ShoppingBasket basket
-) {}
+)
+{
+}

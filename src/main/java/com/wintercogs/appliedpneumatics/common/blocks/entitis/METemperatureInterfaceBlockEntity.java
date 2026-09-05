@@ -40,7 +40,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 
-/** 注意，这里所有的温度单位都是开尔文，而不是摄氏度 */
+/**
+ * 注意，这里所有的温度单位都是开尔文，而不是摄氏度
+ */
 public class METemperatureInterfaceBlockEntity extends AENetworkBlockEntity implements IUpgradeableObject,
         ServerTickingBlockEntity
 {
@@ -76,9 +78,9 @@ public class METemperatureInterfaceBlockEntity extends AENetworkBlockEntity impl
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side)
     {
-        if(cap == PNCCapabilities.HEAT_EXCHANGER_CAPABILITY)
+        if (cap == PNCCapabilities.HEAT_EXCHANGER_CAPABILITY)
         {
-            if(!heatOpt.isPresent())
+            if (!heatOpt.isPresent())
                 heatOpt = LazyOptional.of(() -> heatHandler);
             return heatOpt.cast();
         }
@@ -90,7 +92,7 @@ public class METemperatureInterfaceBlockEntity extends AENetworkBlockEntity impl
     {
         super.invalidateCaps();
 
-        if(heatOpt.isPresent()) heatOpt.invalidate();
+        if (heatOpt.isPresent()) heatOpt.invalidate();
         heatOpt = LazyOptional.empty();
     }
 
@@ -150,23 +152,23 @@ public class METemperatureInterfaceBlockEntity extends AENetworkBlockEntity impl
     @Override
     public void serverTick()
     {
-        if(level == null || level.isClientSide()) return;
+        if (level == null || level.isClientSide()) return;
 
-        if(getMainNode().isActive())
+        if (getMainNode().isActive())
             interactWithME();
 
         this.heatHandler.tick();
 
-        if(lastTemperature != this.heatHandler.getTemperature())
+        if (lastTemperature != this.heatHandler.getTemperature())
         {
             this.lastTemperature = this.heatHandler.getTemperature();
             setChanged();
 
             // 顺便更新状态
             BlockState state = getBlockState();
-            if(lastTemperature > 200 + 273)
+            if (lastTemperature > 200 + 273)
                 level.setBlock(worldPosition, state.setValue(APBlockStates.TEMP_STATE, APBlockStates.TemperatureState.HIGH_TEMPERATURE), SOFT_FLAGS);
-            else if(lastTemperature < -100 + 273)
+            else if (lastTemperature < -100 + 273)
                 level.setBlock(worldPosition, state.setValue(APBlockStates.TEMP_STATE, APBlockStates.TemperatureState.LOW_TEMPERATURE), SOFT_FLAGS);
             else
                 level.setBlock(worldPosition, state.setValue(APBlockStates.TEMP_STATE, APBlockStates.TemperatureState.ROOM_TEMPERATURE), SOFT_FLAGS);
@@ -273,10 +275,10 @@ public class METemperatureInterfaceBlockEntity extends AENetworkBlockEntity impl
     public void addAdditionalDrops(Level level, BlockPos pos, List<ItemStack> drops)
     {
         super.addAdditionalDrops(level, pos, drops);
-        for(int i = 0; i < upgrades.size(); i++)
+        for (int i = 0; i < upgrades.size(); i++)
         {
             ItemStack slotContent = upgrades.getStackInSlot(i);
-            if(slotContent.isEmpty()) continue;
+            if (slotContent.isEmpty()) continue;
             drops.add(slotContent.copy());
         }
     }

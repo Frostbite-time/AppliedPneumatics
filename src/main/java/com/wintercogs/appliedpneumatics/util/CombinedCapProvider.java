@@ -34,15 +34,19 @@ public class CombinedCapProvider implements ICapabilitySerializable<CompoundTag>
     public CompoundTag serializeNBT()
     {
         CompoundTag out = new CompoundTag();
-        if (child instanceof ICapabilitySerializable<?> s1) out.put("child", ((ICapabilitySerializable<CompoundTag>) s1).serializeNBT());
-        if (parent instanceof ICapabilitySerializable<?> s2) out.put("parent", ((ICapabilitySerializable<CompoundTag>) s2).serializeNBT());
+        if (child instanceof ICapabilitySerializable<?> s1)
+            out.put("child", ((ICapabilitySerializable<CompoundTag>) s1).serializeNBT());
+        if (parent instanceof ICapabilitySerializable<?> s2)
+            out.put("parent", ((ICapabilitySerializable<CompoundTag>) s2).serializeNBT());
         return out;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt)
     {
-        if (child instanceof ICapabilitySerializable<?> s1) ((ICapabilitySerializable<CompoundTag>) s1).deserializeNBT(nbt.getCompound("child"));
-        if (parent instanceof ICapabilitySerializable<?> s2) ((ICapabilitySerializable<CompoundTag>) s2).deserializeNBT(nbt.getCompound("parent"));
+        if (child instanceof ICapabilitySerializable<?> s1)
+            ((ICapabilitySerializable<CompoundTag>) s1).deserializeNBT(nbt.getCompound("child"));
+        if (parent instanceof ICapabilitySerializable<?> s2)
+            ((ICapabilitySerializable<CompoundTag>) s2).deserializeNBT(nbt.getCompound("parent"));
     }
 }

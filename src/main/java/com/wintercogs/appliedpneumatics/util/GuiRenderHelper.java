@@ -13,18 +13,18 @@ public class GuiRenderHelper
     /**
      * 绘制具有边框的九宫格纹理，并自动处理拉伸（统一使用 9 参 blit）
      *
-     * @param guiGraphics   GUI 渲染上下文
-     * @param texture       纹理资源位置
-     * @param x             目标位置 X
-     * @param y             目标位置 Y
-     * @param width         目标总宽度
-     * @param height        目标总高度
-     * @param borderTop     上边框大小 (像素)
-     * @param borderBottom  下边框大小 (像素)
-     * @param borderLeft    左边框大小 (像素)
-     * @param borderRight   右边框大小 (像素)
-     * @param origWidth     原始纹理宽度
-     * @param origHeight    原始纹理高度
+     * @param guiGraphics  GUI 渲染上下文
+     * @param texture      纹理资源位置
+     * @param x            目标位置 X
+     * @param y            目标位置 Y
+     * @param width        目标总宽度
+     * @param height       目标总高度
+     * @param borderTop    上边框大小 (像素)
+     * @param borderBottom 下边框大小 (像素)
+     * @param borderLeft   左边框大小 (像素)
+     * @param borderRight  右边框大小 (像素)
+     * @param origWidth    原始纹理宽度
+     * @param origHeight   原始纹理高度
      */
     public static void renderBorderedPanel(
             GuiGraphics guiGraphics,
@@ -33,7 +33,8 @@ public class GuiRenderHelper
             int width, int height,
             int borderTop, int borderBottom,
             int borderLeft, int borderRight,
-            int origWidth, int origHeight) {
+            int origWidth, int origHeight)
+    {
 
         // === 1. 四个角（不拉伸） ===
         // 左上
@@ -69,13 +70,14 @@ public class GuiRenderHelper
                 origWidth, origHeight);
 
         // === 2. 四条边（单向拉伸） ===
-        int dstEdgeW = width  - borderLeft - borderRight;
-        int dstEdgeH = height - borderTop  - borderBottom;
-        int srcEdgeW = origWidth  - borderLeft - borderRight;
-        int srcEdgeH = origHeight - borderTop  - borderBottom;
+        int dstEdgeW = width - borderLeft - borderRight;
+        int dstEdgeH = height - borderTop - borderBottom;
+        int srcEdgeW = origWidth - borderLeft - borderRight;
+        int srcEdgeH = origHeight - borderTop - borderBottom;
 
         // 上边
-        if (borderTop > 0) {
+        if (borderTop > 0)
+        {
             guiGraphics.blit(texture,
                     x + borderLeft, y,
                     dstEdgeW, borderTop,
@@ -85,7 +87,8 @@ public class GuiRenderHelper
         }
 
         // 下边
-        if (borderBottom > 0) {
+        if (borderBottom > 0)
+        {
             guiGraphics.blit(texture,
                     x + borderLeft, y + height - borderBottom,
                     dstEdgeW, borderBottom,
@@ -95,7 +98,8 @@ public class GuiRenderHelper
         }
 
         // 左边
-        if (borderLeft > 0) {
+        if (borderLeft > 0)
+        {
             guiGraphics.blit(texture,
                     x, y + borderTop,
                     borderLeft, dstEdgeH,
@@ -105,7 +109,8 @@ public class GuiRenderHelper
         }
 
         // 右边
-        if (borderRight > 0) {
+        if (borderRight > 0)
+        {
             guiGraphics.blit(texture,
                     x + width - borderRight, y + borderTop,
                     borderRight, dstEdgeH,
@@ -139,7 +144,8 @@ public class GuiRenderHelper
             ResourceLocation texture,
             int x, int y,
             int width, int height,
-            int originalWidth, int originalHeight) {
+            int originalWidth, int originalHeight)
+    {
 
         // 1. 绑定默认 PositionTex shader（同 blitSprite 内部做的事）
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -160,7 +166,8 @@ public class GuiRenderHelper
                                              int xRight,          // 想让文字右边对齐到的 x 坐标
                                              int y,               // y 坐标
                                              int color,
-                                             boolean dropShadow) {         // 颜色 0xAARRGGBB
+                                             boolean dropShadow)
+    {         // 颜色 0xAARRGGBB
         // 1. 计算文字宽度
         int width = font.width(text);
 
@@ -190,13 +197,14 @@ public class GuiRenderHelper
                                             int xA, int xB,
                                             int y,
                                             int color,
-                                            boolean dropShadow) {
+                                            boolean dropShadow)
+    {
         // 1) 规范化左右边界
-        int left  = Math.min(xA, xB);
+        int left = Math.min(xA, xB);
         int right = Math.max(xA, xB);
 
         // 2) 计算文本宽与区域宽
-        int textWidth   = font.width(text);
+        int textWidth = font.width(text);
         int regionWidth = right - left;
 
         // 3) 居中起点

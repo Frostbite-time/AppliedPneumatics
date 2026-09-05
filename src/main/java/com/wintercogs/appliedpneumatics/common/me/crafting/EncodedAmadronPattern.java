@@ -21,8 +21,8 @@ public record EncodedAmadronPattern(ResourceLocation offerId)
     @Override
     public boolean equals(Object obj)
     {
-        if(this == obj) return true;
-        if(obj instanceof EncodedAmadronPattern pattern)
+        if (this == obj) return true;
+        if (obj instanceof EncodedAmadronPattern pattern)
             return offerId.equals(pattern.offerId);
         return false;
     }

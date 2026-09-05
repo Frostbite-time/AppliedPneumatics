@@ -31,9 +31,9 @@ public class MEAmadronProcessStationGUI extends UpgradeableScreen<MEAmadronProce
     public void drawFG(GuiGraphics guiGraphics, int offsetX, int offsetY, int mouseX, int mouseY)
     {
         super.drawFG(guiGraphics, offsetX, offsetY, mouseX, mouseY);
-        if(this.usingStyle.equals(EXTENDED))
-            guiGraphics.drawString(font,Component.translatable("menu.label.appliedpneumatics.me_amadron_process_station.job_amount",menu.latestJobs), 8,75,4210752,false);
+        if (this.usingStyle.equals(EXTENDED))
+            guiGraphics.drawString(font, Component.translatable("menu.label.appliedpneumatics.me_amadron_process_station.job_amount", menu.latestJobs), 8, 75, 4210752, false);
         else
-            guiGraphics.drawString(font,Component.translatable("menu.label.appliedpneumatics.me_amadron_process_station.job_amount",menu.latestJobs), 8,39,4210752,false);
+            guiGraphics.drawString(font, Component.translatable("menu.label.appliedpneumatics.me_amadron_process_station.job_amount", menu.latestJobs), 8, 39, 4210752, false);
     }
 }

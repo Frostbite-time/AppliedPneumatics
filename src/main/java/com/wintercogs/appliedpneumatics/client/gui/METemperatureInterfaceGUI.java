@@ -42,7 +42,7 @@ public class METemperatureInterfaceGUI extends UpgradeableScreen<METemperatureIn
         String temperatureStr = String.format(Locale.ROOT, "%.1f", menu.latestTemperature - 273) + "℃";
         String heatCapStr = String.format(Locale.ROOT, "%.0f", menu.latestHeatCap);
         String expectedTemperatureStr = String.format(Locale.ROOT, "%.1f", menu.latestExpectedTemperature - 273);
-        GuiRenderHelper.drawCenteredInRegion(guiGraphics, this.font, Component.translatable("menu.label.appliedpneumatics.me_temperature_interface.temperature",temperatureStr), 13, 168, 22, 4210752, false);
+        GuiRenderHelper.drawCenteredInRegion(guiGraphics, this.font, Component.translatable("menu.label.appliedpneumatics.me_temperature_interface.temperature", temperatureStr), 13, 168, 22, 4210752, false);
         GuiRenderHelper.drawCenteredInRegion(guiGraphics, this.font, Component.translatable("menu.label.appliedpneumatics.me_temperature_interface.heat_cap", heatCapStr), 13, 168, 38, 4210752, false);
         GuiRenderHelper.drawCenteredInRegion(guiGraphics, this.font, Component.literal(expectedTemperatureStr), 13, 168, 82, 4210752, false);
         GuiRenderHelper.drawCenteredInRegion(guiGraphics, this.font, Component.translatable("menu.label.appliedpneumatics.me_temperature_interface.expected_temperature_text"), 13, 168, 60, 4210752, false);
